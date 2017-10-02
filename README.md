@@ -1,8 +1,5 @@
 # Yummy-Recipes Restful API
-[![Build Status](https://travis-ci.org/geofrocker/Yummy-Recipes.svg?branch=master)](https://travis-ci.org/geofrocker/Yummy-Recipes)
-[![Coverage Status](https://coveralls.io/repos/github/geofrocker/Yummy-Recipes/badge.svg?branch=master)](https://coveralls.io/github/geofrocker/Yummy-Recipes?branch=master)
-![pylint Score](https://mperlet.github.io/pybadge/badges/7.29.svg)
-[![Requirements Status](https://requires.io/github/geofrocker/Yummy-Recipes/requirements.svg?branch=master)](https://requires.io/github/geofrocker/Yummy-Recipes/requirements/?branch=master)
+This space is for badges
 # Description
 Yummy recipies API is an api built using restframework
   * A user can see the available recipes
