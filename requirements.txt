@@ -1,0 +1,7 @@
+Flask
+gunicorn
+pytest
+pylint
+flask-sqlalchemy
+psycopg2
+flask-migrate
