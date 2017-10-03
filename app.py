@@ -7,7 +7,7 @@ import uuid
 from functools import wraps
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/db.sqlite3'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:elizei2@127.0.0.1:5432/rest_api'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -25,12 +25,11 @@ class User(db.Model):
         self.name = email
         self.username = username
         self.email = email
-        self.password = passwordd
+        self.password = password
 
 
 
-    def __repr__(self):
-        return '<Username %r>' % self.username
+    
 # Create Recipe database model
 class Recipe(db.Model):
     __tablename__ = "Recipe"
@@ -149,12 +148,12 @@ def login_user():
         return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
     user = User.query.filter_by(username=auth.username).first()
     if not user:
-        return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
+        return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
     if check_password_hash(user.password, auth.password):
         token = jwt.encode({'id' : user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
         return jsonify({'token' : token.decode('UTF-8')})
-    return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
+    return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
 if __name__ == '__main__':
     app.run(debug=True)
