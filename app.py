@@ -25,8 +25,8 @@ class User(db.Model):
         self.name = email
         self.username = username
         self.email = email
-        self.password = password
-        
+        self.password = passwordd
+
 
 
     def __repr__(self):
