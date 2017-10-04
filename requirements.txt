@@ -6,3 +6,4 @@ flask-sqlalchemy
 psycopg2
 flask-migrate
 pyjwt
+flask_script
