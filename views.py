@@ -2,7 +2,6 @@
 import uuid
 from datetime import datetime, timedelta
 from flask_restful import reqparse, Resource, marshal
-
 from flask import jsonify, make_response, request
 from werkzeug.security import check_password_hash, generate_password_hash
 from serializer import recipe_serializer, user_serializer
