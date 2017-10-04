@@ -9,7 +9,7 @@ from app import app, api, db
 from models import User, Recipe
 from decorators import *
 
-class Recipes(Resource):
+class RecipesList(Resource):
     def get(self):
         """
         Get all Recipes
@@ -34,7 +34,7 @@ class Recipes(Resource):
             return {'Message' : 'Recipe Created'}
         return {'Message' : 'Recipe Creation failed'}
 
-api.add_resource(Recipes, '/')
+api.add_resource(RecipesKist, '/')
 class RecipeItem(Resource):
     @token_required
     def get(current_user, self,id):
