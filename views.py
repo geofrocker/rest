@@ -34,7 +34,7 @@ class RecipesList(Resource):
             return {'Message' : 'Recipe Created'}
         return {'Message' : 'Recipe Creation failed'}
 
-api.add_resource(RecipesKist, '/')
+api.add_resource(RecipesList, '/')
 class RecipeItem(Resource):
     @token_required
     def get(current_user, self,id):
