@@ -4,7 +4,7 @@ from app import app
 def test_home_end_point():
     """Test home page"""
     client = app.test_client()
-    rsp = client.get('/')
+    rsp = client.get('/1')
     assert rsp.status == '200 OK'
 
 def test_one_recipe_end_point():
@@ -41,5 +41,22 @@ def test_Authentication_user_end_point():
     """Test Authenticate_user_end_point"""
     client = app.test_client()
     rsp = client.get('/auth/login')
+    assert rsp.status == '401 UNAUTHORIZED'
+
+def test_get_users_endpoint():
+    """Test the /users end point"""
+    client = app.test_client()
+    rsp = client.get('/users/1')
     assert rsp.status == '200 OK'
-    
+
+def test_get_one_users_endpoint():
+    """Test the /user/****** end point"""
+    client = app.test_client()
+    rsp = client.get('/user/098c6e4a-f358-4122-b65c-073f5f30a4e5')
+    assert rsp.status == '200 OK'
+
+def test_delete_one_user_endpoint():
+    """Test delete the /user/****** end point"""
+    client = app.test_client()
+    rsp = client.delete('/users/1')
+    assert rsp.status == '200 OK'

@@ -1,0 +1,17 @@
+language: python
+python:
+  - "2.7"
+branches:
+    only:
+        - master
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install python-coveralls
+  - pip install coverage
+# command to run tests
+script:
+    - coverage run test.py test
+    - pylint app.py || exit 0
+after_success:
+    - coveralls
