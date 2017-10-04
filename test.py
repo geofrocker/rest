@@ -1,9 +1,8 @@
 """rest api/ test.py"""
 from app import app
-
+client = app.test_client()
 def test_home_end_point():
     """Test home page"""
-    client = app.test_client()
     rsp = client.get('/1')
     assert rsp.status == '200 OK'
 

@@ -7,6 +7,15 @@ recipe_serializer = {
     "ingredients": fields.String,
     "steps": fields.String,
     "create_date": fields.DateTime,
-    "created_by": fields.Integer,
+    "created_by": fields.String,
+   
+}
+
+user_serializer = {
+    "id": fields.String,
+    "name": fields.String,
+    "username": fields.String,
+    "email": fields.String,
+    "password": fields.String,
    
 }

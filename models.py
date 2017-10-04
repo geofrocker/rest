@@ -4,7 +4,7 @@ class User(db.Model):
     """
     Create User database model
     """
-    __tablename__ = "users"
+    __tablename__ = "User"
     id = db.Column(db.String(120), primary_key=True)
     name = db.Column(db.String(120), unique=True)
     username = db.Column(db.String(120), unique=True)
@@ -30,7 +30,7 @@ class Recipe(db.Model):
     ingredients = db.Column(db.String(120), unique=True)
     steps = db.Column(db.String(120), unique=True)
     create_date = db.Column(db.DateTime)
-    created_by = db.Column(db.Integer, db.ForeignKey('User.id'),nullable=False)
+    created_by = db.Column(db.String, db.ForeignKey('User.id'),nullable=True)
 
     def __init__(self, id, title, ingredients, steps, create_date, created_by):
         self.id = id
@@ -42,3 +42,4 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return '<Title %r>' % self.title
+
