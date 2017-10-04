@@ -2,7 +2,7 @@
 import uuid
 from datetime import datetime, timedelta
 from flask_restful import reqparse, Resource, marshal
-
+from flask_paginate import Pagination, get_page_parameter
 from flask import jsonify, make_response, request
 from werkzeug.security import check_password_hash, generate_password_hash
 from serializer import recipe_serializer, user_serializer
@@ -15,6 +15,14 @@ class Recipes(Resource):
         """
         Get all Recipes
         """
+        q = request.args.get('q')
+        if q:
+            recipes = Recipe.query.filter(Recipe.title.match(q)).all()
+            if recipes:
+                recipe_list = marshal(recipes, recipe_serializer)
+                return {"Recipe_list": recipe_list}, 200
+            else:
+                return {'message': 'No recipes found'}, 404
         recipes = Recipe.query.all()
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
