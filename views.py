@@ -28,7 +28,7 @@ class RecipesList(Resource):
         data = request.get_json()
         if data:
             new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'], ingredients=data['ingredients'],
-                                steps=data['steps'], create_date=datetime.now(), created_by=data['created_by'],)
+                                steps=data['steps'], create_date=datetime.now(), created_by=data['created_by'],modified_date=datetime.now() )
             db.session.add(new_recipe)
             db.session.commit()
             return {'Message' : 'Recipe Created'}
@@ -56,6 +56,7 @@ class RecipeItem(Resource):
             return jsonify({'Message':'Recipe not available'})
         recipe.title = data['title']
         recipe.ingredients = data['ingredients']
+        recipe.modified_date = datetime.now()
         recipe.steps = data['steps']
         db.session.commit()
         return {'message':'User Edited successfully'}
@@ -87,7 +88,7 @@ class AuthRegister(Resource):
 
 api.add_resource(AuthRegister, '/auth/register')
 class AuthLogin(Resource):
-    def get(self):
+    def post(self):
         """Login a registerd user"""
         auth = request.authorization
         if not auth or not auth.username or not auth.password:

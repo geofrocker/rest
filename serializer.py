@@ -8,6 +8,8 @@ recipe_serializer = {
     "steps": fields.String,
     "create_date": fields.DateTime,
     "created_by": fields.String,
+    "modified_date": fields.DateTime,
+    
    
 }
 
