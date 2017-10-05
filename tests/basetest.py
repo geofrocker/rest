@@ -1,7 +1,8 @@
 """BaseTestCase"""
 from flask import Flask, request
 from unittest import TestCase
-from app import app, db, User, Recipe
+from app import app, db
+from models import User, Recipe
 from flask_sqlalchemy import SQLAlchemy
 import json
 
@@ -17,17 +18,11 @@ class BaseTestCase(TestCase):
         #self.user=User(id='5xxxxx', name='Geofrey', username='geom', email='geom@gmail.com', password='12345')
         #db.session.add(self.user)
         #db.session.commit()
-        """ Generate authentication token"""
-        self.user_login = {"username": "geom", "password": password}
-        response = self.client.post(
-            '/auth/login', data=self.user_login,
-            headers={'Content-Type': 'application/json'})
-        import pdb; pdb.set_trace()
-        response_data = json.loads(response.data)
         
-        token = response_data['Token']
-        self.headers = {'Authorization': token,
+        token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM4NDM5NGYyLTcxZWYtNDZhOS1iOGQ1LWE5MWI4Yjk4MmMwZiIsImV4cCI6MTUwNzI0NzMxMn0.6DuvyRfmkvK4Yy4uBo1sBO4rQW8bpn2cpvJx40Cr2YI'
+        self.headers = {'Authorization': Basic eyJ0eXAiOiJKV1QiLCJhb,
                         'Content-Type': 'application/json',
+                        'x-access-token' : token
                         }
         
     def tearDown(self):

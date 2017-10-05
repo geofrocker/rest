@@ -6,10 +6,10 @@ class User(db.Model):
     """
     __tablename__ = "User"
     id = db.Column(db.String(120), primary_key=True)
-    name = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(120))
     username = db.Column(db.String(120), unique=True)
-    email = db.Column(db.String(120), unique=True)
-    password = db.Column(db.String(120), unique=True)
+    email = db.Column(db.String(120))
+    password = db.Column(db.String(120))
 
     def __init__(self, id, name, username, email, password):
         self.id = id
