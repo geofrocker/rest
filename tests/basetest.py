@@ -19,11 +19,11 @@ class BaseTestCase(TestCase):
         #db.session.add(self.user)
         #db.session.commit()
         
-        token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM4NDM5NGYyLTcxZWYtNDZhOS1iOGQ1LWE5MWI4Yjk4MmMwZiIsImV4cCI6MTUwNzI0NzMxMn0.6DuvyRfmkvK4Yy4uBo1sBO4rQW8bpn2cpvJx40Cr2YI'
-        self.headers = {'Authorization': Basic eyJ0eXAiOiJKV1QiLCJhb,
-                        'Content-Type': 'application/json',
-                        'x-access-token' : token
-                        }
+        token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM4NDM5NGYyLTcxZWYtNDZhOS1iOGQ1LWE5MWI4Yjk4MmMwZiIsImV4cCI6MTUwNzI1NDUwNX0.DnsMeUsIGK2hab4oXb4DRqegfhtB9osi0VF7UoAXErg'
+        headers = {'Authorization': 'Basic eyJ0eXAiOiJKV1QiLCJhb',
+                                'Content-Type': 'application/json',
+                                'x-access-token' : token
+                                }
         
     def tearDown(self):
         db.drop_all()

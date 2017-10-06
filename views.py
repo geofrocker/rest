@@ -98,7 +98,7 @@ class AuthLogin(Resource):
             return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
         if check_password_hash(user.password, auth.password):
-            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=30)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=120)}, app.config['SECRET_KEY'])
             return jsonify({'token' : token.decode('UTF-8')})
         return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
