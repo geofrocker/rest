@@ -35,9 +35,9 @@ POST /auth/login | Logs a user in and generates a unique token
 POST /auth/register | Register a user
 POST /  | Create a new recipe
 GET / | Get all the public recipes
-GET /<id> | Get single recipe
-PUT /<id> | Update a specific recipe
-DELETE /<id> | Delete a specific recipe
+GET /<recipe_id> | Get single recipe
+PUT /<recipe_id> | Update a specific recipe
+DELETE /<recipe_id> | Delete a specific recipe
 GET /users | Get all users
-GET /users/<id> | Get user by id
-DELETE /users/<id> | Delete a user by id
+GET /users/<user_id> | Get user by id
+DELETE /users/<user_id> | Delete a user by id
