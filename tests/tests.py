@@ -1,5 +1,5 @@
 import json
-from rest_api.tests.basetest import BaseTestCase
+from tests.basetest import BaseTestCase
 
 class Recipes(BaseTestCase):
     def test_register(self):
