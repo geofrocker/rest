@@ -28,3 +28,16 @@ Yummy recipies API is an api built using restframework
 # For Testing purposes
   * I recommend that you install Postman from [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en)
   * This will help you to test the api efficiently. click [here](https://www.getpostman.com/postman) to get started
+
+EndPoint | Functionality
+------------ | -------------
+POST /auth/login | Logs a user in and generates a unique token
+POST /auth/register | Register a user
+POST /  | Create a new recipe
+GET / | Get all the public recipes
+GET /<id> | Get single recipe
+PUT /<id> | Update a specific recipe
+DELETE /<id> | Delete a specific recipe
+GET /users | Get all users
+GET /users/<id> | Get user by id
+DELETE /users/<id> | Delete a user by id
