@@ -19,7 +19,7 @@ class RecipesList(Resource):
             recipe_list = marshal(recipes, recipe_serializer)
             return {"Recipe_list": recipe_list}, 200
         else:
-            return {'message': 'No recipes found'}, 404
+            return {'message': 'No recipes found'}, 200
     @token_required
     def post(current_user, self):
         """
@@ -59,7 +59,7 @@ class RecipeItem(Resource):
         recipe.modified_date = datetime.now()
         recipe.steps = data['steps']
         db.session.commit()
-        return {'message':'User Edited successfully'}
+        return {'message':'Recipe Edited successfully'}
 
     @token_required
     def delete(current_user, self, id):
@@ -90,14 +90,14 @@ api.add_resource(AuthRegister, '/auth/register')
 class AuthLogin(Resource):
     def post(self):
         """Login a registerd user"""
-        auth = request.authorization
-        if not auth or not auth.username or not auth.password:
+        auth = request.get_json()
+        if not auth or not auth['username'] or not auth['password']:
             return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
-        user = User.query.filter_by(username=auth.username).first()
+        user = User.query.filter_by(username=auth['username']).first()
         if not user:
             return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
-        if check_password_hash(user.password, auth.password):
+        if check_password_hash(user.password, auth['password']):
             token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=120)}, app.config['SECRET_KEY'])
             return jsonify({'token' : token.decode('UTF-8')})
         return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})

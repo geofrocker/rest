@@ -31,7 +31,7 @@ class Recipe(db.Model):
     steps = db.Column(db.String(120))
     create_date = db.Column(db.DateTime)
     modified_date = db.Column(db.DateTime, nullable=True)
-    created_by = db.Column(db.String, db.ForeignKey('User.id'),nullable=True)
+    created_by = db.Column(db.String, db.ForeignKey('User.id'), nullable=True)
 
     def __init__(self, id, title, ingredients, steps, create_date, created_by, modified_date):
         self.id = id
