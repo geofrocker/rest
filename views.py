@@ -1,52 +1,65 @@
-"""/rest api views.py"""
+"""/rest_api views.py"""
 import uuid
 from datetime import datetime, timedelta
 from flask_restful import reqparse, Resource, marshal
 from flask import jsonify, make_response, request
 from werkzeug.security import check_password_hash, generate_password_hash
-from serializer import recipe_serializer, user_serializer
+from serializer import recipe_serializer, user_serializer, category_serializer
 from app import app, api, db
-from models import User, Recipe
+from models import User, Recipe, Category
 from decorators import *
+from config import POSTS_PER_PAGE
+
 
 class RecipesList(Resource):
-    def get(self):
+    def get(self, page=1):
         """
         Get all Recipes
         """
-        recipes = Recipe.query.all()
+        search = request.args.get('q')
+        if search:
+            recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%')).paginate(page, POSTS_PER_PAGE, False).items
+            if recipes:
+                recipe_list = marshal(recipes, recipe_serializer)
+                return {"Recipe_list": recipe_list}, 200
+            else:
+                return {'message': 'No recipes found'}, 200
+
+        recipes = Recipe.query.paginate(page, POSTS_PER_PAGE, False).items
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
             return {"Recipe_list": recipe_list}, 200
         else:
             return {'message': 'No recipes found'}, 200
     @token_required
-    def post(current_user, self):
+    def post(current, self):
         """
         Add a recipe to the database
         """
         data = request.get_json()
         if data:
-            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'], ingredients=data['ingredients'],
-                                steps=data['steps'], create_date=datetime.now(), created_by=data['created_by'],modified_date=datetime.now() )
+            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'],
+                                ingredients=data['ingredients'], steps=data['steps'],
+                                create_date=datetime.now(),
+                                created_by=data['created_by'], modified_date=datetime.now())
             db.session.add(new_recipe)
             db.session.commit()
             return {'Message' : 'Recipe Created'}
         return {'Message' : 'Recipe Creation failed'}
 
-api.add_resource(RecipesList, '/')
+api.add_resource(RecipesList, '/<int:page>','/')
 class RecipeItem(Resource):
     @token_required
-    def get(current_user, self,id):
+    def get(current_user, self, id):
         """get on one recipe"""
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
             return {'Message':'Recipe not found'}
         if recipe:
-            recipe_list = marshal(recipe, recipe_serializer)
-            return {"Recipe_list": recipe_list}, 200
+            recipe_item = marshal(recipe, recipe_serializer)
+            return {"Recipe_Item": recipe_item}, 200
         else:
-            return {'message': 'Recipes Not found'}, 404
+            return {'message': 'Recipe Not found'}, 404
     @token_required
     def put(current_user, self, id):
         """Edit a recipe by id"""
@@ -55,6 +68,7 @@ class RecipeItem(Resource):
         if not recipe:
             return jsonify({'Message':'Recipe not available'})
         recipe.title = data['title']
+        recipe.category = data['category']
         recipe.ingredients = data['ingredients']
         recipe.modified_date = datetime.now()
         recipe.steps = data['steps']
@@ -69,7 +83,7 @@ class RecipeItem(Resource):
             return {'Message':'Recipe not available'}
         db.session.delete(recipe)
         db.session.commit()
-        return {'message':'Recipe Edited successfully'}
+        return {'message':'Recipe Deleted successfully'}
 
 api.add_resource(RecipeItem, '/<id>')
 
@@ -145,3 +159,68 @@ class OneUser(Resource):
         return {'Message':'User deleted'}
 
 api.add_resource(OneUser, '/users/<id>')
+
+class CategoryList(Resource):
+    def get(self):
+        """
+        Get all Categories
+        """
+        categories = Category.query.all()
+        if categories:
+            category_list = marshal(categories, category_serializer)
+            return {"Category_list": category_list}, 200
+        else:
+            return {'message': 'No categories found'}, 200
+
+    def post(self):
+        """
+        Add a category to the database
+        """
+        data = request.get_json()
+        if data:
+            new_category = Category(cat_id=str(uuid.uuid4()), cat_name=data['cat_name'],
+                                cat_desc=data['cat_desc'], create_date=datetime.now(),
+                                created_by=data['created_by'], modified_date=datetime.now())
+            db.session.add(new_category)
+            db.session.commit()
+            return {'Message' : 'Category Created'}
+        return {'Message' : 'Category  Creation failed'}
+
+api.add_resource(CategoryList, '/category')
+
+class CategoryItem(Resource):
+    @token_required
+    def get(current_user, self, id):
+        """get one category"""
+        category = Category.query.filter_by(cat_id=id).first()
+        if not category:
+            return {'Message':'Category not found'}
+        if category:
+            category_item = marshal(category, category_serializer)
+            return {"Category_Item": category_item}, 200
+        else:
+            return {'message': 'Category Not found'}, 404
+    @token_required
+    def put(current_user, self, id):
+        """Edit a Category by id"""
+        data = request.get_json()
+        category = Category.query.filter_by(cat_id=id).first()
+        if not category:
+            return jsonify({'Message':'Category not available'})
+        category.cat_name = data['cat_name']
+        category.cat_desc = data['cat_desc']
+        category.modified_date = datetime.now()
+        db.session.commit()
+        return {'message':'Category Edited successfully'}
+
+    @token_required
+    def delete(current_user, self, id):
+        """Delete Category by id"""
+        category = Category.query.filter_by(cat_id=id).first()
+        if not category:
+            return {'Message':'Category not available'}
+        db.session.delete(category)
+        db.session.commit()
+        return {'message':'Category Deleted successfully'}
+
+api.add_resource(CategoryItem, '/category/<id>')

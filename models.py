@@ -1,4 +1,4 @@
-"""/rest api models.py"""
+"""/rest_api models.py"""
 from app import db
 class User(db.Model):
     """
@@ -27,13 +27,14 @@ class Recipe(db.Model):
     __tablename__ = "Recipe"
     id = db.Column(db.String(120), primary_key=True)
     title = db.Column(db.String(120))
+    category = db.Column(db.String, db.ForeignKey('Category.cat_name'), nullable=True)
     ingredients = db.Column(db.String(120))
     steps = db.Column(db.String(120))
     create_date = db.Column(db.DateTime)
     modified_date = db.Column(db.DateTime, nullable=True)
-    created_by = db.Column(db.String, db.ForeignKey('User.id'), nullable=True)
+    created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
 
-    def __init__(self, id, title, ingredients, steps, create_date, created_by, modified_date):
+    def __init__(self, id, title, category, ingredients, steps, create_date, created_by, modified_date):
         self.id = id
         self.title = title
         self.ingredients = ingredients
@@ -44,4 +45,24 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return '<Title %r>' % self.title
+
+class Category(db.Model):
+    __tablename__ = "Category"
+    cat_id = db.Column(db.String(100), primary_key=True)
+    cat_name = db.Column(db.String(50), unique=True)
+    cat_desc = db.Column(db.String(100))
+    create_date = db.Column(db.DateTime)
+    created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
+    modified_date = db.Column(db.DateTime)
+
+    def __init__(self, cat_id, cat_name, cat_desc, create_date, created_by, modified_date):
+        self.cat_id = cat_id
+        self.cat_name = cat_name
+        self.cat_desc = cat_desc
+        self.create_date = create_date
+        self.created_by = created_by
+        self.modified_date = modified_date
+        
+    def __repr__(self):
+        return '<Name %r>' % self.cat_name
 

@@ -1,4 +1,4 @@
-"""/rest_api app.py"""
+"""/rest app.py"""
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy

@@ -1,0 +1,10 @@
+{
+    "python.unitTest.pyTestArgs": [
+        "testing"
+    ],
+    "python.unitTest.pyTestEnabled": false,
+    "python.unitTest.promptToConfigure": false,
+    "python.unitTest.unittestEnabled": false,
+    "python.unitTest.nosetestsEnabled": false,
+    "git.ignoreLimitWarning": true
+}
