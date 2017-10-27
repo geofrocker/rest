@@ -2,7 +2,7 @@
 from flask import Flask, request
 from unittest import TestCase
 from app import app, db
-from models import User, Recipe
+from models import User, Recipe, Category
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 from datetime import datetime
@@ -24,9 +24,15 @@ class BaseTestCase(TestCase):
         db.session.add(test_user)
         db.session.commit()
 
+        # create and add test category
+        self.cat_test={'cat_id':'5xxxxx','cat_name':'General','cat_desc':'General recpes','created_by':None}
+        test_category = Category(cat_id='5xxxxx', cat_name='General', cat_desc='General recpes', create_date=datetime.now(), created_by=None, modified_date=datetime.now())
+        db.session.add(test_category)
+        db.session.commit()
+
         # create and add test recipe
-        self.recipe_test={'id':'5xxxxx','title':'Recipe One','ingredients':'Ingredient one and two','steps':'step 1','created_by':None}
-        test_recipe = Recipe(id='5xxxxx', title='Recipe One', ingredients='Ingredient one and two', steps='step 1', create_date=datetime.now(), created_by=None, modified_date=datetime.now())
+        self.recipe_test={'id':'5xxxxx','title':'Recipe One','category':'General','ingredients':'Ingredient one and two','steps':'step 1','created_by':None}
+        test_recipe = Recipe(id='5xxxxx', title='Recipe One', category='General', ingredients='Ingredient one and two', steps='step 1', create_date=datetime.now(), created_by=None, modified_date=datetime.now())
         db.session.add(test_recipe)
         db.session.commit()
 

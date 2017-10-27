@@ -12,42 +12,43 @@ from config import POSTS_PER_PAGE
 
 
 class RecipesList(Resource):
-    def get(self, page=1):
+    def get(self):
         """
         Get all Recipes
         """
         search = request.args.get('q')
+        page = request.args.get('page')
+        if page:
+            page = int(page)
         if search:
             recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%')).paginate(page, POSTS_PER_PAGE, False).items
-            if recipes:
-                recipe_list = marshal(recipes, recipe_serializer)
-                return {"Recipe_list": recipe_list}, 200
-            else:
-                return {'message': 'No recipes found'}, 200
-
-        recipes = Recipe.query.paginate(page, POSTS_PER_PAGE, False).items
+        elif page:
+            recipes = Recipe.query.paginate(page, POSTS_PER_PAGE, False).items
+        else:
+            recipes = Recipe.query.all()
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
             return {"Recipe_list": recipe_list}, 200
         else:
-            return {'message': 'No recipes found'}, 200
+            return {'message': 'No recipes found'}, 404
+
     @token_required
-    def post(current, self):
+    def post(current_user, self):
         """
         Add a recipe to the database
         """
         data = request.get_json()
         if data:
-            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'],
+            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'], category=data['category'],
                                 ingredients=data['ingredients'], steps=data['steps'],
                                 create_date=datetime.now(),
-                                created_by=data['created_by'], modified_date=datetime.now())
+                                created_by=current_user.username, modified_date=datetime.now())
             db.session.add(new_recipe)
             db.session.commit()
             return {'Message' : 'Recipe Created'}
         return {'Message' : 'Recipe Creation failed'}
 
-api.add_resource(RecipesList, '/<int:page>','/')
+api.add_resource(RecipesList, '/')
 class RecipeItem(Resource):
     @token_required
     def get(current_user, self, id):
@@ -98,7 +99,7 @@ class AuthRegister(Resource):
             db.session.add(new_user)
             db.session.commit()
             return {'Message':'User Created'}
-        return jsonify({'Message':'No data submitted'})
+        return {'Message':'No data submitted'}
 
 api.add_resource(AuthRegister, '/auth/register')
 class AuthLogin(Resource):
@@ -112,7 +113,7 @@ class AuthLogin(Resource):
             return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
         if check_password_hash(user.password, auth['password']):
-            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=120)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=60)}, app.config['SECRET_KEY'])
             return jsonify({'token' : token.decode('UTF-8')})
         return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
@@ -170,7 +171,7 @@ class CategoryList(Resource):
             category_list = marshal(categories, category_serializer)
             return {"Category_list": category_list}, 200
         else:
-            return {'message': 'No categories found'}, 200
+            return {'message': 'No categories found'}, 404
 
     def post(self):
         """
@@ -224,3 +225,27 @@ class CategoryItem(Resource):
         return {'message':'Category Deleted successfully'}
 
 api.add_resource(CategoryItem, '/category/<id>')
+
+class Dashboard(Resource):
+    @token_required
+    def get(current_user, self, page=1):
+        """
+        Get all Recipes
+        """
+        search = request.args.get('q')
+        if search:
+            recipes = Recipe.query.filter_by(created_by=current_user.username).filter(Recipe.title.ilike('%' + search + '%')).paginate(page, POSTS_PER_PAGE, False).items
+            if recipes:
+                recipe_list = marshal(recipes, recipe_serializer)
+                return {"Recipe_list": recipe_list}, 200
+            else:
+                return {'message': 'No recipes found'}, 404
+
+        recipes = Recipe.query.filter_by(created_by=current_user.username).paginate(page, POSTS_PER_PAGE, False).items
+        if recipes:
+            recipe_list = marshal(recipes, recipe_serializer)
+            return {"Recipe_list": recipe_list}, 200
+        else:
+            return {'message': 'No recipes found'}, 404
+
+api.add_resource(Dashboard, '/dashboard')

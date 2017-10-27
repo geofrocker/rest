@@ -13,7 +13,7 @@ class User(db.Model):
 
     def __init__(self, id, name, username, email, password):
         self.id = id
-        self.name = email
+        self.name = name
         self.username = username
         self.email = email
         self.password = password
@@ -37,6 +37,7 @@ class Recipe(db.Model):
     def __init__(self, id, title, category, ingredients, steps, create_date, created_by, modified_date):
         self.id = id
         self.title = title
+        self.category = category
         self.ingredients = ingredients
         self.steps = steps
         self.create_date = create_date
