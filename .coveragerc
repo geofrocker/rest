@@ -1,5 +1,6 @@
 [run]
 omit =
+    *flask_restful*
     *_bootlocale.py                
     *encodings\cp1252.py
     *pycache*
@@ -41,11 +42,12 @@ omit =
     *pytz*
     *pyasnl*
     *dateutil*
-    *aniso8601*      
+    *aniso8601*    
 
 
 [report]
 omit =
+    *flask_restful*
     *sqlalchemy*
     *numbers*
     *decimal*
@@ -85,6 +87,7 @@ omit =
 
 [post]
 omit =
+    *flask_restful*
     *sqlalchemy*
     *numbers*
     *decimal*
