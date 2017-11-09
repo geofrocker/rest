@@ -7,8 +7,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from serializer import recipe_serializer, user_serializer, category_serializer
 from app import app, api, db
 from models import User, Recipe, Category
-from decorators import *
-from config import POSTS_PER_PAGE
+from decorators import token_required
+POSTS_PER_PAGE = 1
+
 
 
 class RecipesList(Resource):
@@ -16,12 +17,13 @@ class RecipesList(Resource):
         """
         Get all Recipes
         """
+        
         search = request.args.get('q')
         page = request.args.get('page')
         if page:
             page = int(page)
         if search:
-            recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%')).paginate(page, POSTS_PER_PAGE, False).items
+            recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%')).paginate(page, 1, False).items
         elif page:
             recipes = Recipe.query.paginate(page, POSTS_PER_PAGE, False).items
         else:

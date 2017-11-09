@@ -37,4 +37,28 @@ class Tests(BaseTestCase):
     def test_delete_users(self):
         response = self.client.delete('/users/5xxxxx', data=self.user_test, headers=self.headers)
         assert response.status == "200 OK"
+
+    def test_get_categories(self):
+        response = self.client.get('/category', headers=self.headers)
+        assert response.status == "200 OK"
+
+    def test_post_category(self):
+        response = self.client.post('/category', data=json.dumps(self.cat_test), headers=self.headers)
+        assert response.status == "200 OK"
+
+    def test_get_category(self):
+        response = self.client.get('/category/5xxxxx', headers=self.headers)
+        assert response.status == "200 OK"
+
+    def test_edit_category(self):
+        response = self.client.put('/category/5xxxxx', data=json.dumps(self.cat_test), headers=self.headers)
+        assert response.status == "200 OK"
+
+    def test_delete_category(self):
+        response = self.client.delete('/category/5xxxxx', data=json.dumps(self.cat_test), headers=self.headers)
+        assert response.status == "200 OK"
+
+    def test_dashboard(self):
+        response = self.client.get('/dashboard', headers=self.headers)
+        assert response.status == "404 NOT FOUND"
         

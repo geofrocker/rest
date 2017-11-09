@@ -3,8 +3,10 @@
         "testing"
     ],
     "python.unitTest.pyTestEnabled": false,
-    "python.unitTest.promptToConfigure": false,
     "python.unitTest.unittestEnabled": false,
-    "python.unitTest.nosetestsEnabled": false,
-    "git.ignoreLimitWarning": true
+    "python.unitTest.nosetestsEnabled": true,
+    "git.ignoreLimitWarning": true,
+    "python.unitTest.nosetestArgs": [
+        "tests"
+    ]
 }

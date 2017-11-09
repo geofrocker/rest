@@ -11,13 +11,6 @@ class User(db.Model):
     email = db.Column(db.String(120))
     password = db.Column(db.String(120))
 
-    def __init__(self, id, name, username, email, password):
-        self.id = id
-        self.name = name
-        self.username = username
-        self.email = email
-        self.password = password
-
     def __repr__(self):
         return '<Username %r>' % self.username
 
@@ -34,16 +27,6 @@ class Recipe(db.Model):
     modified_date = db.Column(db.DateTime, nullable=True)
     created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
 
-    def __init__(self, id, title, category, ingredients, steps, create_date, created_by, modified_date):
-        self.id = id
-        self.title = title
-        self.category = category
-        self.ingredients = ingredients
-        self.steps = steps
-        self.create_date = create_date
-        self.created_by = created_by
-        self.modified_date= modified_date
-
     def __repr__(self):
         return '<Title %r>' % self.title
 
@@ -55,15 +38,6 @@ class Category(db.Model):
     create_date = db.Column(db.DateTime)
     created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
     modified_date = db.Column(db.DateTime)
-
-    def __init__(self, cat_id, cat_name, cat_desc, create_date, created_by, modified_date):
-        self.cat_id = cat_id
-        self.cat_name = cat_name
-        self.cat_desc = cat_desc
-        self.create_date = create_date
-        self.created_by = created_by
-        self.modified_date = modified_date
         
     def __repr__(self):
         return '<Name %r>' % self.cat_name
-

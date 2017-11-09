@@ -42,8 +42,7 @@ omit =
     *pytz*
     *pyasnl*
     *dateutil*
-    *aniso8601*    
-
+    *aniso8601*
 
 [report]
 omit =
@@ -88,29 +87,44 @@ omit =
 [post]
 omit =
     *flask_restful*
+    *_bootlocale.py                
+    *encodings\cp1252.py
+    *pycache*
     *sqlalchemy*
     *numbers*
     *decimal*
     *unittest*
-    *sqlite*
     *werkzeug*
     *psycopg2*
     *asyncio*
     *concurrent*
     *ctypes*
     *encodings*
+    *jwt*
     *jinja2*
+    *itsdangerous.py*
     *_bootlocale.py*
     *fractions.py*
     *hmac.py*
     *html*
+    *http*
     *mimetypes.py*
     *multiprocessing*
     *click*
     *colorama*
+    *cryptography*
+    *flask*
+    *itsdangerous.py *
+    *markupsafe*
+    *six.py *
+    *cryptography*
+    *flask*
+    *itsdangerous.py*
+    *markupsafe*
+    *six.py*
     *stringprep.py*
     *typing.py*
-    *uuid.py*
+    *uuid.py* 
     *pytz*
     *pyasnl*
     *dateutil*

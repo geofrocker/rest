@@ -9,3 +9,4 @@ pyjwt
 flask_script
 flask_restful
 python-coveralls
+python-decouple
