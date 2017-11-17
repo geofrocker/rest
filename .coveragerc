@@ -43,6 +43,7 @@ omit =
     *pyasnl*
     *dateutil*
     *aniso8601*
+    *decouple.py*
 
 [report]
 omit =
@@ -81,6 +82,7 @@ omit =
     *pyasnl*
     *dateutil*
     *aniso8601*
+    *decouple.py*
 
 
 
@@ -129,3 +131,4 @@ omit =
     *pyasnl*
     *dateutil*
     *aniso8601*
+    *decouple.py*
