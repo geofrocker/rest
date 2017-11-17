@@ -9,4 +9,6 @@ pyjwt
 flask_script
 flask_restful
 python-coveralls
+pytest-cov
 python-decouple
+flask-cors

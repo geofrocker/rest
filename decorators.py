@@ -2,6 +2,7 @@ from flask import request
 import jwt
 from functools import wraps
 from models import User
+from decouple import config
 from app import app
 """decorators"""
 def token_required(f):
@@ -18,7 +19,7 @@ def token_required(f):
             return {'Message': 'You have no access token'}, 401
         try:
             
-            data = jwt.decode(token, app.config['SECRET_KEY'])
+            data = jwt.decode(token, config('SECRET_KEY'))
             
             current_user = User.query.filter_by(id=data['id']).first()
         except:

@@ -1,7 +1,8 @@
 __pycache__/
 .spyproject/
 .cache/
-.coverage/
+.coverage
+.coveragerc
 .cache/v/cache/
 .vscode/
 config.py

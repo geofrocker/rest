@@ -7,7 +7,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from serializer import recipe_serializer, user_serializer, category_serializer
 from app import app, api, db
 from models import User, Recipe, Category
-from decorators import token_required
+from decouple import config
+from decorators import *
 POSTS_PER_PAGE = 1
 
 
@@ -115,7 +116,7 @@ class AuthLogin(Resource):
             return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
         if check_password_hash(user.password, auth['password']):
-            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=60)}, app.config['SECRET_KEY'])
+            token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=60)}, config('SECRET_KEY'))
             return jsonify({'token' : token.decode('UTF-8')})
         return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 

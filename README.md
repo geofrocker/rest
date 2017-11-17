@@ -23,6 +23,11 @@ Yummy recipies API is an api built using restframework
   * Make sure all the requirements are installed by running `pip install -r requirements.txt`
   * Make sure you are in the projects root directory
   * Open your terminal and run `py.test test.py`
+  * Or `PYTHON_PATH=. pytest test/tests.py -r Pf --cov=.`
+  * To install nose use:`sudo pip install nose`
+  * Then just use:`nosetests --with -coverage`
+
+  *
   * You will be good to go :boom::boom:
 
 # For Testing purposes
