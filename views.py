@@ -31,9 +31,9 @@ class RecipesList(Resource):
             recipes = Recipe.query.all()
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
-            return {"Recipe_list": recipe_list}, 200
+            return ({"Recipe_list": recipe_list}, 200)
         else:
-            return {'message': 'No recipes found'}, 404
+            return ({'message': 'No recipes found'}, 404)
 
     @token_required
     def post(current_user, self):
@@ -48,8 +48,8 @@ class RecipesList(Resource):
                                 created_by=current_user.username, modified_date=datetime.now())
             db.session.add(new_recipe)
             db.session.commit()
-            return {'Message' : 'Recipe Created'}
-        return {'Message' : 'Recipe Creation failed'}
+            return ({'Message' : 'Recipe Created'},201)
+        return ({'Message' : 'Recipe Creation failed'},200)
 
 api.add_resource(RecipesList, '/')
 class RecipeItem(Resource):
@@ -57,8 +57,6 @@ class RecipeItem(Resource):
     def get(current_user, self, id):
         """get on one recipe"""
         recipe = Recipe.query.filter_by(id=id).first()
-        if not recipe:
-            return {'Message':'Recipe not found'}
         if recipe:
             recipe_item = marshal(recipe, recipe_serializer)
             return {"Recipe_Item": recipe_item}, 200
@@ -70,24 +68,24 @@ class RecipeItem(Resource):
         data = request.get_json()
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
-            return jsonify({'Message':'Recipe not available'})
+            return ({'Message':'Recipe not available'},404)
         recipe.title = data['title']
         recipe.category = data['category']
         recipe.ingredients = data['ingredients']
         recipe.modified_date = datetime.now()
         recipe.steps = data['steps']
         db.session.commit()
-        return {'message':'Recipe Edited successfully'}
+        return ({'message':'Recipe Edited successfully'},201)
 
     @token_required
     def delete(current_user, self, id):
         """Delete recipe by id"""
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
-            return {'Message':'Recipe not available'}
+            return ({'Message':'Recipe not available'},404)
         db.session.delete(recipe)
         db.session.commit()
-        return {'message':'Recipe Deleted successfully'}
+        return ({'message':'Recipe Deleted successfully'},200)
 
 api.add_resource(RecipeItem, '/<id>')
 
@@ -101,8 +99,8 @@ class AuthRegister(Resource):
                             email=data['email'], password=password_hash)
             db.session.add(new_user)
             db.session.commit()
-            return {'Message':'User Created'}
-        return {'Message':'No data submitted'}
+            return ({'Message':'User Created'},201)
+        return ({'Message':'No data submitted'},200)
 
 api.add_resource(AuthRegister, '/auth/register')
 class AuthLogin(Resource):
@@ -113,12 +111,12 @@ class AuthLogin(Resource):
             return make_response('Could not verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
         user = User.query.filter_by(username=auth['username']).first()
         if not user:
-            return make_response('Could nott verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
+            return make_response('Invalid user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
         if check_password_hash(user.password, auth['password']):
             token = jwt.encode({'id' : user.id, 'exp' : datetime.utcnow() + timedelta(minutes=60)}, config('SECRET_KEY'))
             return jsonify({'token' : token.decode('UTF-8')})
-        return make_response('Could nottt verify user', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
+        return make_response('Invalid password', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
 api.add_resource(AuthLogin, '/auth/login')
 
@@ -146,9 +144,9 @@ class OneUser(Resource):
         user = User.query.filter_by(id=id).first()
         if user:
             user_item = marshal(user, user_serializer)
-            return {"user_item": user_item}, 200
+            return ({"user_item": user_item}, 200)
         else:
-            return {'message': 'User not found'}, 404
+            return ({'message': 'User not found'}, 404)
     
     @token_required
     def delete(current_user, self, id):

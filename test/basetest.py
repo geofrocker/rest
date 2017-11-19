@@ -19,7 +19,7 @@ class BaseTestCase(TestCase):
         
         # create and add a test user        
         password = '12345'
-        self.user_test={'id':'5xxxxx', 'name':'Geofrey', 'username':'geom', 'email':'geom@gmail.com', 'password':password}
+        self.user_test={'id':'5xxxxx', 'name':'Geofrey', 'username':'geof', 'email':'geom@gmail.com', 'password':password}
         password_hash = generate_password_hash(password, method='sha256')
         test_user = User(id='5xxxxx', name='Geofrey', username='geom', email='geom@gmail.com', password=password_hash)
         db.session.add(test_user)
@@ -38,9 +38,9 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
         """ Generate authentication token"""
-        user = {"username": "geom", "password": password}
+        self.user = {"username": "geom", "password": password}
         response = self.client.post(
-            '/auth/login', data=json.dumps(user),
+            '/auth/login', data=json.dumps(self.user),
             headers={'Content-Type': 'application/json'})
         
         response_data = json.loads(response.data)

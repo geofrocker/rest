@@ -14,7 +14,6 @@ class User(db.Model):
     def __repr__(self):
         return '<Username %r>' % self.username
 
-    
 # Create Recipe database model
 class Recipe(db.Model):
     __tablename__ = "Recipe"
@@ -28,7 +27,8 @@ class Recipe(db.Model):
     created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
 
     def __repr__(self):
-        return '<Title %r>' % self.title
+        return '%r' % self.title
+
 
 class Category(db.Model):
     __tablename__ = "Category"
@@ -41,3 +41,4 @@ class Category(db.Model):
         
     def __repr__(self):
         return '<Name %r>' % self.cat_name
+
