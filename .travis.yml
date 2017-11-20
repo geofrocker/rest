@@ -11,7 +11,7 @@ install:
   - pip install coverage
 # command to run tests
 script:
-    - nosetests --with-coverage --cover-package=''
+    - nosetests --with-coverage --cover-package=recipes
     - pylint app.py || exit 0
 after_success:
   - coveralls
