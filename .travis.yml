@@ -29,5 +29,6 @@ before_script:
 script:
     - nosetests --with-coverage --cover-package=recipes
     - pylint app.py || exit 0
+
 after_success:
-  - coveralls
+  coveralls
