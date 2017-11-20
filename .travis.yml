@@ -18,7 +18,7 @@ before_script:
   - echo "DATABASE_URL=postgresql://localhost/rest_api" >> .env
   - echo "TEST_DB=postgresql://localhost/ApiTests" >> .env
   - sudo -u postgres createdb ApiTests
-  - sudo -u postgres createdb rest_api
+  - createdb rest_api
   - python manage.py db init
   - python manage.py db migrate
   - python manage.py db upgrade
