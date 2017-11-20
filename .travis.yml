@@ -15,9 +15,11 @@ install:
 
 before_script:
   - echo "DEBUG=True" >> .env
+  - echo "SECRET_KEY=\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8" >> .env
   - echo "DATABASE_URL=postgresql://localhost/rest_api" >> .env
   - echo "TEST_DB=postgresql://localhost/ApiTests" >> .env
   - sudo -u postgres createdb ApiTests
+  - sudo -u postgres createdb rest_api
   - python manage.py db init
   - python manage.py db migrate
   - python manage.py db upgrade
