@@ -20,7 +20,7 @@ env:
 
 
 before_script:
-  - createdb database ApiTests
+  - sudo -u postgres createdb ApiTests
   - python manage.py db init
   - python manage.py db migrate
   - python manage.py db upgrade
