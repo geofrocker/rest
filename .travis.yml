@@ -11,9 +11,9 @@ install:
   - pip install coverage
 # command to run tests
 script:
-    - nosetests --with-coverage
+    - nosetests --with-coverage --cover-package=''
     - pylint app.py || exit 0
 after_success:
-    - coveralls
+  - coveralls
 env:
   - DB=postgres

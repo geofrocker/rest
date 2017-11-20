@@ -1,8 +1,8 @@
 """/rest_api basetest.py"""
 from flask import Flask, request
 from unittest import TestCase
-from app import app, db
-from models import User, Recipe, Category
+from recipes import app, db
+from recipes.models import User, Recipe, Category
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 from datetime import datetime

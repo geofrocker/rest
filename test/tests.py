@@ -1,6 +1,6 @@
 import json
-from test.basetest import BaseTestCase
-from app import app, db
+from .basetest import BaseTestCase
+from recipes import app, db
 
 class Tests(BaseTestCase):
     def test_register(self):

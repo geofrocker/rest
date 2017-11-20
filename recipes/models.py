@@ -1,5 +1,5 @@
 """/rest_api models.py"""
-from app import db
+from recipes import db
 class User(db.Model):
     """
     Create User database model
@@ -28,6 +28,18 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return '%r' % self.title
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+        return Recipe.query.filter_by(id=self.id).first()
+
+    @staticmethod
+    def delete(id, user):
+        recipe = Recipe.query.filter_by(id=id, created_by=user).first()
+        db.session.delete(bucket)
+        db.session.commit()
+
 
 
 class Category(db.Model):

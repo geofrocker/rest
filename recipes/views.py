@@ -1,16 +1,38 @@
 """/rest_api views.py"""
 import uuid
 from datetime import datetime, timedelta
-from flask_restful import reqparse, Resource, marshal
+from functools import wraps
+import jwt
+from flask_restful import Resource, marshal
 from flask import jsonify, make_response, request
 from werkzeug.security import check_password_hash, generate_password_hash
-from serializer import recipe_serializer, user_serializer, category_serializer
-from app import app, api, db
-from models import User, Recipe, Category
+from recipes.serializer import recipe_serializer, user_serializer, category_serializer
+from recipes import api, db
+from recipes.models import User, Recipe, Category
 from decouple import config
-from decorators import *
 POSTS_PER_PAGE = 1
 
+def token_required(f):
+    """
+    Ensure only logged in users access the system
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+ 
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+        if not token:
+            return {'Message': 'You have no access token'}, 401
+        try:
+            
+            data = jwt.decode(token, config('SECRET_KEY'))
+            
+            current_user = User.query.filter_by(id=data['id']).first()
+        except:
+            return {'message' : 'Invalid Token'}, 401
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 
 class RecipesList(Resource):
@@ -18,7 +40,6 @@ class RecipesList(Resource):
         """
         Get all Recipes
         """
-        
         search = request.args.get('q')
         page = request.args.get('page')
         if page:
@@ -42,16 +63,17 @@ class RecipesList(Resource):
         """
         data = request.get_json()
         if data:
-            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'], category=data['category'],
+            new_recipe = Recipe(id=str(uuid.uuid4()), title=data['title'],
+                                category=data['category'],
                                 ingredients=data['ingredients'], steps=data['steps'],
                                 create_date=datetime.now(),
                                 created_by=current_user.username, modified_date=datetime.now())
             db.session.add(new_recipe)
             db.session.commit()
-            return ({'Message' : 'Recipe Created'},201)
-        return ({'Message' : 'Recipe Creation failed'},200)
+            return ({'Message' : 'Recipe Created'}, 201)
+        return ({'Message' : 'Recipe Creation failed'}, 200)
 
-api.add_resource(RecipesList, '/')
+
 class RecipeItem(Resource):
     @token_required
     def get(current_user, self, id):
@@ -68,26 +90,26 @@ class RecipeItem(Resource):
         data = request.get_json()
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
-            return ({'Message':'Recipe not available'},404)
+            return ({'Message':'Recipe not available'}, 404)
         recipe.title = data['title']
         recipe.category = data['category']
         recipe.ingredients = data['ingredients']
         recipe.modified_date = datetime.now()
         recipe.steps = data['steps']
         db.session.commit()
-        return ({'message':'Recipe Edited successfully'},201)
+        return ({'message':'Recipe Edited successfully'}, 201)
 
     @token_required
     def delete(current_user, self, id):
         """Delete recipe by id"""
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
-            return ({'Message':'Recipe not available'},404)
+            return ({'Message':'Recipe not available'}, 404)
         db.session.delete(recipe)
         db.session.commit()
-        return ({'message':'Recipe Deleted successfully'},200)
+        return ({'message':'Recipe Deleted successfully'}, 200)
 
-api.add_resource(RecipeItem, '/<id>')
+
 
 class AuthRegister(Resource):
     def post(self):
@@ -99,10 +121,10 @@ class AuthRegister(Resource):
                             email=data['email'], password=password_hash)
             db.session.add(new_user)
             db.session.commit()
-            return ({'Message':'User Created'},201)
-        return ({'Message':'No data submitted'},200)
+            return ({'Message':'User Created'}, 201)
+        return ({'Message':'No data submitted'}, 200)
 
-api.add_resource(AuthRegister, '/auth/register')
+
 class AuthLogin(Resource):
     def post(self):
         """Login a registerd user"""
@@ -118,7 +140,7 @@ class AuthLogin(Resource):
             return jsonify({'token' : token.decode('UTF-8')})
         return make_response('Invalid password', 401, {'WWW-Authenticate' : 'Basic Realm="Login Required"'})
 
-api.add_resource(AuthLogin, '/auth/login')
+
 
 class Users(Resource):
     @token_required
@@ -133,7 +155,6 @@ class Users(Resource):
         else:
             return {'message': 'No users found'}, 404
 
-api.add_resource(Users, '/users')
 
 class OneUser(Resource):
     @token_required
@@ -160,7 +181,6 @@ class OneUser(Resource):
         db.session.commit()
         return {'Message':'User deleted'}
 
-api.add_resource(OneUser, '/users/<id>')
 
 class CategoryList(Resource):
     def get(self):
@@ -181,14 +201,13 @@ class CategoryList(Resource):
         data = request.get_json()
         if data:
             new_category = Category(cat_id=str(uuid.uuid4()), cat_name=data['cat_name'],
-                                cat_desc=data['cat_desc'], create_date=datetime.now(),
-                                created_by=data['created_by'], modified_date=datetime.now())
+                                    cat_desc=data['cat_desc'], create_date=datetime.now(),
+                                    created_by=data['created_by'], modified_date=datetime.now())
             db.session.add(new_category)
             db.session.commit()
             return {'Message' : 'Category Created'}
         return {'Message' : 'Category  Creation failed'}
 
-api.add_resource(CategoryList, '/category')
 
 class CategoryItem(Resource):
     @token_required
@@ -225,7 +244,7 @@ class CategoryItem(Resource):
         db.session.commit()
         return {'message':'Category Deleted successfully'}
 
-api.add_resource(CategoryItem, '/category/<id>')
+
 
 class Dashboard(Resource):
     @token_required
@@ -250,3 +269,11 @@ class Dashboard(Resource):
             return {'message': 'No recipes found'}, 404
 
 api.add_resource(Dashboard, '/dashboard')
+api.add_resource(RecipesList, '/')
+api.add_resource(RecipeItem, '/<id>')
+api.add_resource(AuthRegister, '/auth/register')
+api.add_resource(AuthLogin, '/auth/login')
+api.add_resource(Users, '/users')
+api.add_resource(OneUser, '/users/<id>')
+api.add_resource(CategoryList, '/category')
+api.add_resource(CategoryItem, '/category/<id>')
