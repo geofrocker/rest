@@ -83,7 +83,7 @@ class Tests(BaseTestCase):
     def test_delete_recipe(self):
         response = self.client.delete('/5xxxxx', data=json.dumps(self.recipe_test),
                                       headers=self.headers)
-        response2 = self.client.put('/khjsdjkwjkwd', data=json.dumps(self.recipe_test),
+        response2 = self.client.delete('/khjsdjkwjkwd', data=json.dumps(self.recipe_test),
                                    headers=self.headers)
         self.assertIn('Recipe Deleted successfully', str(response.data))
         self.assertIn('Recipe not available', str(response2.data))
