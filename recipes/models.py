@@ -29,19 +29,6 @@ class Recipe(db.Model):
     def __repr__(self):
         return '%r' % self.title
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-        return Recipe.query.filter_by(id=self.id).first()
-
-    @staticmethod
-    def delete(id, user):
-        recipe = Recipe.query.filter_by(id=id, created_by=user).first()
-        db.session.delete(bucket)
-        db.session.commit()
-
-
-
 class Category(db.Model):
     __tablename__ = "Category"
     cat_id = db.Column(db.String(100), primary_key=True)
@@ -53,4 +40,3 @@ class Category(db.Model):
         
     def __repr__(self):
         return '<Name %r>' % self.cat_name
-
