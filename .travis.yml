@@ -16,8 +16,7 @@ install:
 env:
   global:
     - export SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
-    - export TEST_DB = 'postgresql://localhost/ApiTests'
-    - export DATABASE_URL = 'postgresql://localhost/rest_api'
+    - export DATABASE_URL = 'postgresql://localhost/ApiTests'
 
 
 before_script:
