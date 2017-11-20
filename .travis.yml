@@ -4,11 +4,19 @@ python:
 branches:
     only:
         - master
+services:
+  - postgresql
+
 # command to install dependencies
 install:
   - pip install -r requirements.txt
-  - pip install python-coveralls
+  - pip install coveralls
   - pip install coverage
+
+before_script:
+  - psql -c 'create database ApiTests;' -U postgres
+  - python manage.py db upgrade
+
 # command to run tests
 script:
     - nosetests --with-coverage --cover-package=recipes
@@ -16,4 +24,4 @@ script:
 after_success:
   - coveralls
 env:
-  - DB=postgres
+  - TEST_DB = 'postgresql://localhost/ApiTests'
