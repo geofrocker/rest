@@ -11,13 +11,13 @@ from decouple import config
 import json
 
 class BaseTestCase(TestCase):
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['TEST_DB']
+    app.config['SQLALCHEMY_DATABASE_URI'] = config('TEST_DB') or os.environ['TEST_DB']
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     def setUp(self):
         self.client = app.test_client()
         db.drop_all()
         db.create_all()
-        
+
         # create and add a test user        
         password = '12345'
         self.user_test={'id':'5xxxxx', 'name':'Geofrey', 'username':'geof', 'email':'geom@gmail.com', 'password':password}
