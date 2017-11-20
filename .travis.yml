@@ -25,3 +25,4 @@ after_success:
   - coveralls
 env:
   - TEST_DB = 'postgresql://localhost/ApiTests'
+  - DATABASE_URL = 'postgresql://localhost/rest_api'
