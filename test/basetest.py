@@ -1,4 +1,5 @@
 """/rest_api basetest.py"""
+import os
 from flask import Flask, request
 from unittest import TestCase
 from recipes import app, db
@@ -10,8 +11,8 @@ from decouple import config
 import json
 
 class BaseTestCase(TestCase):
-    app.config['SQLALCHEMY_DATABASE_URI'] = config('TEST_DB')
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = config('SQLALCHEMY_TRACK_MODIFICATIONS')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     def setUp(self):
         self.client = app.test_client()
         db.drop_all()
