@@ -26,8 +26,6 @@ class Tests(BaseTestCase):
         self.assertIn('Invalid password', str(response3.data))
         self.assertIn('Could not verify user', str(response4.data))
 
-
-
     def test_recipes(self):
         response = self.client.get('/', headers=self.headers)
         response2 = self.client.get('/?page=1', headers=self.headers)
@@ -59,7 +57,6 @@ class Tests(BaseTestCase):
         assert response.status_code == 401
         assert response2.status_code == 401
 
-
     def test_add_recipe(self):
         response = self.client.post('/', data=json.dumps(self.recipe_test), headers=self.headers)
         response2 = self.client.post('/', content_type='application/json', data=json.dumps([]), headers=self.headers)
@@ -77,8 +74,6 @@ class Tests(BaseTestCase):
         assert response.status_code == 201
         self.assertIn('Recipe not available', str(response2.data))
         assert response2.status_code == 404
-        
-        
 
     def test_delete_recipe(self):
         response = self.client.delete('/5xxxxx', data=json.dumps(self.recipe_test),
@@ -141,21 +136,21 @@ class Tests(BaseTestCase):
         assert response.status == "200 OK"
 
     def test_dashboard(self):
-        response = self.client.get('/dashboard', headers=self.headers)
+        response = self.client.get('/myrecipes', headers=self.headers)
         self.assertIn('No recipes found', str(response.data))
         assert response.status_code == 404
         self.client.post('/', data=json.dumps(self.recipe_test), headers=self.headers)
-        response2= self.client.get('/dashboard', headers=self.headers)
+        response2= self.client.get('/myrecipes', headers=self.headers)
         self.assertIn('Recipe One', str(response2.data))
         assert response2.status_code == 200
         
     def test_search(self):    
         """Test if the user has submitted search query"""
-        response = self.client.get('/dashboard?q=hdsahhajsdhjds', headers=self.headers)
+        response = self.client.get('/myrecipes?q=hdsahhajsdhjds', headers=self.headers)
         self.assertIn('No recipes found', str(response.data))
         assert response.status_code == 404
         self.client.post('/', data=json.dumps(self.recipe_test), headers=self.headers)
-        response2 = self.client.get('/dashboard?q=Recipe One', headers=self.headers)
+        response2 = self.client.get('/myrecipes?q=Recipe One', headers=self.headers)
         self.assertIn('Recipe One', str(response2.data))
         assert response2.status_code == 200
 

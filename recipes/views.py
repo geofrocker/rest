@@ -244,9 +244,7 @@ class CategoryItem(Resource):
         db.session.commit()
         return {'message':'Category Deleted successfully'}
 
-
-
-class Dashboard(Resource):
+class MyRecipes(Resource):
     @token_required
     def get(current_user, self, page=1):
         """
@@ -268,7 +266,7 @@ class Dashboard(Resource):
         else:
             return {'message': 'No recipes found'}, 404
 
-api.add_resource(Dashboard, '/dashboard')
+api.add_resource(MyRecipes, '/myrecipes')
 api.add_resource(RecipesList, '/')
 api.add_resource(RecipeItem, '/<id>')
 api.add_resource(AuthRegister, '/auth/register')
