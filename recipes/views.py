@@ -4,7 +4,7 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 from flask_restful import Resource, marshal
-from flask import jsonify, make_response, request
+from flask import jsonify, make_response, request, redirect
 from werkzeug.security import check_password_hash, generate_password_hash
 from recipes.serializer import recipe_serializer, user_serializer, category_serializer
 from recipes import api, db
@@ -260,6 +260,11 @@ class MyRecipes(Resource):
         else:
             return {'message': 'No recipes found'}, 404
 
+class Documentation(Resource):
+    def docs(self):
+        return redirect("https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#/")
+
+
 api.add_resource(MyRecipes, '/myrecipes')
 api.add_resource(RecipesList, '/')
 api.add_resource(RecipeItem, '/<id>')
@@ -269,3 +274,4 @@ api.add_resource(Users, '/users')
 api.add_resource(OneUser, '/users/<id>')
 api.add_resource(CategoryList, '/category')
 api.add_resource(CategoryItem, '/category/<id>')
+api.add_resource(Documentation, '/documentation')

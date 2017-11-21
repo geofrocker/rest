@@ -18,7 +18,3 @@ app.config['SECRET_KEY'] = config('SECRET_KEY') or os.environ['SECRET_KEY']
 db = SQLAlchemy(app)
 api = Api(app)
 from recipes import views
-
-@app.route('/documentation')
-def docs():
-    return redirect("https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#/")
