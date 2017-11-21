@@ -10,7 +10,7 @@ class Tests(BaseTestCase):
         self.assertIn('User Created', str(response.data))
         self.assertIn('No data submitted', str(response2.data))
         assert response.status_code == 201
-        assert response2.status_code == 200 
+        assert response2.status_code == 200
 
     def test_login(self):
         response = self.client.post('/auth/login', content_type='application/json',
