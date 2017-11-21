@@ -12,7 +12,21 @@ class User(db.Model):
     password = db.Column(db.String(120))
 
     def __repr__(self):
-        return '<Username %r>' % self.username
+        return '%r' % self.id
+
+    def save(self):
+        """
+        method used for adding users
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        method used for deleting users
+        """
+        db.session.delete(self)
+        db.session.commit()
 
 # Create Recipe database model
 class Recipe(db.Model):
@@ -29,6 +43,20 @@ class Recipe(db.Model):
     def __repr__(self):
         return '%r' % self.title
 
+    def save(self):
+        """
+        method used for adding recipes
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        method used for deleting recipes
+        """
+        db.session.delete(self)
+        db.session.commit()
+
 class Category(db.Model):
     __tablename__ = "Category"
     cat_id = db.Column(db.String(100), primary_key=True)
@@ -40,3 +68,17 @@ class Category(db.Model):
         
     def __repr__(self):
         return '<Name %r>' % self.cat_name
+
+    def save(self):
+        """
+        method used for adding categories
+        """
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        """
+        method used for deleting categories
+        """
+        db.session.delete(self)
+        db.session.commit()

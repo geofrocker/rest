@@ -1,8 +1,8 @@
 """/rest_api views.py"""
 import uuid
+import jwt
 from datetime import datetime, timedelta
 from functools import wraps
-import jwt
 from flask_restful import Resource, marshal
 from flask import jsonify, make_response, request
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -68,8 +68,7 @@ class RecipesList(Resource):
                                 ingredients=data['ingredients'], steps=data['steps'],
                                 create_date=datetime.now(),
                                 created_by=current_user.username, modified_date=datetime.now())
-            db.session.add(new_recipe)
-            db.session.commit()
+            new_recipe.save()
             return ({'Message' : 'Recipe Created'}, 201)
         return ({'Message' : 'Recipe Creation failed'}, 200)
 
@@ -105,8 +104,7 @@ class RecipeItem(Resource):
         recipe = Recipe.query.filter_by(id=id).first()
         if not recipe:
             return ({'Message':'Recipe not available'}, 404)
-        db.session.delete(recipe)
-        db.session.commit()
+        recipe.delete()
         return ({'message':'Recipe Deleted successfully'}, 200)
 
 
@@ -119,8 +117,7 @@ class AuthRegister(Resource):
             password_hash = generate_password_hash(data['password'], method='sha256')
             new_user = User(id=str(uuid.uuid4()), name=data['name'], username=data['username'],
                             email=data['email'], password=password_hash)
-            db.session.add(new_user)
-            db.session.commit()
+            new_user.save()
             return ({'Message':'User Created'}, 201)
         return ({'Message':'No data submitted'}, 200)
 
@@ -177,8 +174,7 @@ class OneUser(Resource):
         user = User.query.filter_by(id=id).first()
         if not user:
             return {'Message':'User not available'}
-        db.session.delete(user)
-        db.session.commit()
+        user.delete()
         return {'Message':'User deleted'}
 
 
@@ -203,8 +199,7 @@ class CategoryList(Resource):
             new_category = Category(cat_id=str(uuid.uuid4()), cat_name=data['cat_name'],
                                     cat_desc=data['cat_desc'], create_date=datetime.now(),
                                     created_by=data['created_by'], modified_date=datetime.now())
-            db.session.add(new_category)
-            db.session.commit()
+            new_category.save()
             return {'Message' : 'Category Created'}
         return {'Message' : 'Category  Creation failed'}
 
@@ -240,8 +235,7 @@ class CategoryItem(Resource):
         category = Category.query.filter_by(cat_id=id).first()
         if not category:
             return {'Message':'Category not available'}
-        db.session.delete(category)
-        db.session.commit()
+        category.delete()
         return {'message':'Category Deleted successfully'}
 
 class MyRecipes(Resource):

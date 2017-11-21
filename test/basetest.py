@@ -23,20 +23,17 @@ class BaseTestCase(TestCase):
         self.user_test={'id':'5xxxxx', 'name':'Geofrey', 'username':'geof', 'email':'geom@gmail.com', 'password':password}
         password_hash = generate_password_hash(password, method='sha256')
         test_user = User(id='5xxxxx', name='Geofrey', username='geom', email='geom@gmail.com', password=password_hash)
-        db.session.add(test_user)
-        db.session.commit()
-
+        test_user.save()
+        
         # create and add test category
         self.cat_test={'cat_id':'5xxxxxx','cat_name':'Generall','cat_desc':'General recpes','created_by':None}
         test_category = Category(cat_id='5xxxxx', cat_name='General', cat_desc='General recpes', create_date=datetime.now(), created_by=None, modified_date=datetime.now())
-        db.session.add(test_category)
-        db.session.commit()
+        test_category.save()
 
         # create and add test recipe
         self.recipe_test={'id':'5xxxxx','title':'Recipe One','category':None,'ingredients':'Ingredient one and two','steps':'step 1','created_by':None}
         test_recipe = Recipe(id='5xxxxx', title='Recipe One', category=None, ingredients='Ingredient one and two', steps='step 1', create_date=datetime.now(), created_by=None, modified_date=datetime.now())
-        db.session.add(test_recipe)
-        db.session.commit()
+        test_recipe.save()
 
         """ Generate authentication token"""
         self.user = {"username": "geom", "password": password}
