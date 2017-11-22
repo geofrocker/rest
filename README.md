@@ -26,13 +26,13 @@ Yummy recipies API is an api built using restframework
   * `SQLALCHEMY_TRACK_MODIFICATIONS = False`
   * `SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'`
 
-# How run test
+# How run tests
   * Make sure all the requirements are installed by running `pip install -r requirements.txt`
   * Make sure you are in the projects root directory
-  * Open your terminal and run `py.test test.py`
+  * Open your terminal and run `py.test test/tests.py`
   * Or `PYTHON_PATH=. pytest test/tests.py -r Pf --cov=.`
   * To install nose use:`sudo pip install nose`
-  * Then just use:`nosetests --with -coverage`
+  * Then just use:`nosetests --with-coverage --cover-package=recipes`
 
   *
   * You will be good to go :boom::boom:
