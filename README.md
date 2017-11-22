@@ -12,11 +12,13 @@ Yummy recipies API is an api built using restframework
   * This application has been tested with [Python 3.4](https://www.python.org/) and [Flask 0.11](http://flask.pocoo.org/)
   * Make sure the above requirements are satisfied
   * Navigate to the project root directory and run `pip install -r requirements.txt` from command line. [Learn more a pip](https://pypi.python.org/pypi/pip) if you don't have it already installed
+  * Create a .env file in the root directory and fill it with the lines below.
   * Run `python app.py` from command line or terminal
   * You should be able to see something similar to this
   ![A screen shot of flask running in cmd](/github.com/geofrocker/Yummy-Recipes/raw/master/A%20screen%20shot%20of%20flask%20running%20in%20cmd.png)
   * Visit your browser and enter `127.0.0.1/5000`
   * :boom::boom: You will be good to go
+  * You can access the documentation from [here](https://yummy-api.herokuapp.com/documentation)
 # Create a .env file and add the following variables
   * `DEBUG = True`
   * `DATABASE_URL = 'postgresql://localhost/rest_api'`
