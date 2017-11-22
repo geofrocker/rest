@@ -18,11 +18,11 @@ Yummy recipies API is an api built using restframework
   * Visit your browser and enter `127.0.0.1/5000`
   * :boom::boom: You will be good to go
 # Create a .env file and add the following variables
-`DEBUG = True`
-`DATABASE_URL = 'postgresql://localhost/rest_api'`
-`TEST_DB = 'postgresql://localhost/ApiTests'`
-`SQLALCHEMY_TRACK_MODIFICATIONS = False`
-`SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'`
+  * `DEBUG = True`
+  * `DATABASE_URL = 'postgresql://localhost/rest_api'`
+  * `TEST_DB = 'postgresql://localhost/ApiTests'`
+  * `SQLALCHEMY_TRACK_MODIFICATIONS = False`
+  * `SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'`
 
 # How run test
   * Make sure all the requirements are installed by running `pip install -r requirements.txt`
