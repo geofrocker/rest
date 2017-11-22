@@ -33,8 +33,6 @@ Yummy recipies API is an api built using restframework
   * Or `PYTHON_PATH=. pytest test/tests.py -r Pf --cov=.`
   * To install nose use:`sudo pip install nose`
   * Then just use:`nosetests --with-coverage --cover-package=recipes`
-
-  *
   * You will be good to go :boom::boom:
 
 # For Testing purposes
