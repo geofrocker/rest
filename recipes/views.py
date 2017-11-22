@@ -113,12 +113,16 @@ class AuthRegister(Resource):
     def post(self):
         """Register New User"""
         data = request.get_json()
+        
         if data:
-            password_hash = generate_password_hash(data['password'], method='sha256')
-            new_user = User(id=str(uuid.uuid4()), name=data['name'], username=data['username'],
-                            email=data['email'], password=password_hash)
-            new_user.save()
-            return ({'Message':'User Created'}, 201)
+            user = User.query.filter_by(email=data['email'], username=data['username']).first()
+            if not user:
+                password_hash = generate_password_hash(data['password'], method='sha256')
+                new_user = User(id=str(uuid.uuid4()), name=data['name'], username=data['username'],
+                                email=data['email'], password=password_hash)
+                new_user.save()
+                return ({'Message':'User Created'}, 201)
+            return ({'Message':'Email or username already exists'}, 200)
         return ({'Message':'No data submitted'}, 200)
 
 
@@ -261,7 +265,7 @@ class MyRecipes(Resource):
             return {'message': 'No recipes found'}, 404
 
 class Documentation(Resource):
-    def docs(self):
+    def get(self):
         return redirect("https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#/")
 
 

@@ -7,8 +7,11 @@ class Tests(BaseTestCase):
         response = self.client.post('/auth/register', content_type='application/json',
                                     data=json.dumps(self.user_test))
         response2 = self.client.post('/auth/register')
+        response3 = self.client.post('/auth/register', content_type='application/json',
+                                    data=json.dumps(self.user_test))
         self.assertIn('User Created', str(response.data))
         self.assertIn('No data submitted', str(response2.data))
+        self.assertIn('Email or username already exists', str(response3.data))
         assert response.status_code == 201
         assert response2.status_code == 200
 
