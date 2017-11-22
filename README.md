@@ -17,7 +17,12 @@ Yummy recipies API is an api built using restframework
   ![A screen shot of flask running in cmd](/github.com/geofrocker/Yummy-Recipes/raw/master/A%20screen%20shot%20of%20flask%20running%20in%20cmd.png)
   * Visit your browser and enter `127.0.0.1/5000`
   * :boom::boom: You will be good to go
-
+# Create a .env file and add the following variables
+`DEBUG = True`
+`DATABASE_URL = 'postgresql://localhost/rest_api'`
+`TEST_DB = 'postgresql://localhost/ApiTests'`
+`SQLALCHEMY_TRACK_MODIFICATIONS = False`
+`SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'`
 
 # How run test
   * Make sure all the requirements are installed by running `pip install -r requirements.txt`
