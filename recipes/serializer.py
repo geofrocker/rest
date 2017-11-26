@@ -2,7 +2,7 @@
 from flask_restful import fields
 
 recipe_serializer = {
-    "id": fields.String,
+    "recipe_id": fields.String,
     "title": fields.String,
     "category": fields.String,
     "ingredients": fields.String,
@@ -10,6 +10,8 @@ recipe_serializer = {
     "create_date": fields.DateTime,
     "created_by": fields.String,
     "modified_date": fields.DateTime,
+    "upvotes": fields.Integer,
+    "status": fields.String
 }
 
 category_serializer = {
@@ -22,7 +24,7 @@ category_serializer = {
 }
 
 user_serializer = {
-    "id": fields.String,
+    "user_id": fields.String,
     "name": fields.String,
     "username": fields.String,
     "email": fields.String,
