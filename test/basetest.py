@@ -22,6 +22,9 @@ class BaseTestCase(TestCase):
         db.drop_all()
         db.create_all()
 
+        #test users for login
+        self.user2={'username':'geom','password':'12345'}
+
         # create and add a test user        
         password = '12345'
         self.user_test={'user_id':'5xxxxx', 'name':'Geofrey', 'username':'geom', 'email':'geom2@gmail.com', 'password':password}
@@ -35,7 +38,7 @@ class BaseTestCase(TestCase):
         save(test_category)
 
         # create and add test recipe
-        self.recipe_test={'recipe_id':'5xxxxx','title':'Recipe One','category':'General','ingredients':'Ingredient one and two','steps':'step 1','created_by':'geom', 'status':'public', 'upvotes':0}
+        self.recipe_test={'recipe_id':'5xxxxx','title':'Recipe One and two','category':'General','ingredients':'Ingredient one and two','steps':'step 1','created_by':'geom', 'status':'public', 'upvotes':0}
         test_recipe = Recipe(recipe_id='5xxxxx', title='Recipe One', category='General', ingredients='Ingredient one and two', steps='step 1', create_date=datetime.now(), created_by='geof', modified_date=datetime.now(), status='public', upvotes=0)
         save(test_recipe)
 

@@ -17,8 +17,10 @@ class Tests(BaseTestCase):
         self.assertEqual( response2.status_code, 200)
 
     def test_login(self):
+        self.client.post('/auth/register', content_type='application/json',
+                                    data=json.dumps(self.user_test))
         response = self.client.post('/auth/login', content_type='application/json',
-                                    data=json.dumps(self.user))
+                                    data=json.dumps(self.user2))
         response2 = self.client.post('/auth/login', content_type='application/json',
                                     data=json.dumps({"username": "geomssd", "password": '12345'}))
         response3 = self.client.post('/auth/login', content_type='application/json',
@@ -27,7 +29,7 @@ class Tests(BaseTestCase):
                                     data=json.dumps({}))
         self.assertTrue(response)
         self.assertIn('User does not exist', str(response2.data))
-        self.assertIn('User does not exist', str(response3.data))
+        self.assertIn('Invalid password', str(response3.data))
         self.assertIn('Please enter your username and password', str(response4.data))
 
     def test_recipes(self):
@@ -64,9 +66,9 @@ class Tests(BaseTestCase):
     def test_add_recipe(self):
         response = self.client.post('/', data=json.dumps(self.recipe_test), headers=self.headers)
         response2 = self.client.post('/', content_type='application/json', data=json.dumps([]), headers=self.headers)
-        self.assertIn('Title already exists', str(response.data))
+        self.assertIn('Recipe Created', str(response.data))
         self.assertIn('No data submitted', str(response2.data))
-        self.assertEqual( response.status_code, 400)
+        self.assertEqual( response.status_code, 201)
 
     def test_edit_recipe(self):
         self
@@ -74,8 +76,8 @@ class Tests(BaseTestCase):
                                    headers=self.headers)
         response2 = self.client.put('/khjsdjkwjkwd', data=json.dumps(self.recipe_test),
                                    headers=self.headers)
-        self.assertIn('Title already exists', str(response.data))
-        self.assertEqual( response.status_code, 400)
+        self.assertIn('Recipe Edited successfully', str(response.data))
+        self.assertEqual( response.status_code, 201)
         self.assertIn('Recipe not available', str(response2.data))
         self.assertEqual( response2.status_code, 404)
 

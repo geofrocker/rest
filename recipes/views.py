@@ -96,6 +96,7 @@ class RecipesList(Resource):
         Add a recipe to the database
         """
         data = request.get_json()
+        #numKeys = len(data.keys())
         if data:
             title = data.get('title')
             ingredients = data.get('ingredients')
