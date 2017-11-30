@@ -27,6 +27,8 @@ class Recipe(db.Model):
     created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
     status = db.Column(db.String, default='public')
     upvotes = db.Column(db.Integer, default=0)
+    reviews = db.relationship("Review", backref='recipe', lazy='dynamic',
+                              cascade="delete, delete-orphan")
     
 
     def __repr__(self):
@@ -43,6 +45,18 @@ class Category(db.Model):
         
     def __repr__(self):
         return '<Name %r>' % self.cat_name
+
+# Create review model
+class Review(db.Model):
+    __tablename__ = "Review"
+    review_id = db.Column(db.String(120), primary_key=True)
+    content = db.Column(db.String(120))
+    recipe_id = db.Column(db.String, db.ForeignKey('Recipe.recipe_id'), nullable=True)
+    create_date = db.Column(db.DateTime)
+    created_by = db.Column(db.String, db.ForeignKey('User.username'), nullable=True)
+
+    def __repr__(self):
+        return '%r' % self.content
 
 def save(model_instance):
     """

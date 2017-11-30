@@ -96,7 +96,6 @@ class RecipesList(Resource):
         Add a recipe to the database
         """
         data = request.get_json()
-        #numKeys = len(data.keys())
         if data:
             title = data.get('title')
             ingredients = data.get('ingredients')
@@ -118,7 +117,7 @@ class RecipesList(Resource):
                                                             create_date=datetime.now(),
                                                             created_by=current_user.username, modified_date=datetime.now(), status=data['status'])
                                         save(new_recipe)
-                                        return ({'Message' : 'Recipe Created'}, 201)
+                                        return ({'Message' : 'Recipe Created','status':201}, 201)
                                     return ({'Message' : 'Title already exists'}, 400)
                                 return ({'Message' : 'Category does not exist'}, 400)
                             return ({'Message' : 'The status should either be public or private'}, 400)
@@ -166,8 +165,9 @@ class RecipeItem(Resource):
                                         recipe.ingredients = data['ingredients']
                                         recipe.modified_date = datetime.now()
                                         recipe.steps = data['steps']
+                                        recipe.status = data['status']
                                         db.session.commit()
-                                        return ({'message':'Recipe Edited successfully'}, 201)
+                                        return ({'Message':'Recipe Edited successfully','status':201}, 201)
                                     return ({'Message' : 'Title already exists'}, 400)
                                 return ({'Message' : 'Category does not exist'}, 400)
                             return ({'Message' : 'The status should either be public or private'}, 400)
@@ -184,6 +184,7 @@ class RecipeItem(Resource):
         if not recipe:
             return ({'Message':'Recipe not available'}, 404)
         delete(recipe)
+        return redirect("/myrecipes")
         return ({'message':'Recipe Deleted successfully'}, 200)
 
 
@@ -210,7 +211,7 @@ class AuthRegister(Resource):
                                         new_user = User(user_id=str(uuid.uuid4()), name=data['name'], username=data['username'],
                                                         email=data['email'], password=password_hash)
                                         save(new_user)
-                                        return ({'Message':'User Created'}, 201)
+                                        return ({'Message':'Your are now registered! You can log in','status':201}, 201)
                                     return ({'Message':'Username already exists'}, 200)
                                 return ({'Message':'Email already exists'}, 200)
                             return ({'Message':'Password must be more than 4 characters'}, 200)
@@ -309,7 +310,7 @@ class CategoryList(Resource):
                                                     cat_desc=data['cat_desc'], create_date=datetime.now(),
                                                     created_by=current_user.username, modified_date=datetime.now())
                             save(new_category)
-                            return ({'Message' : 'Category Created'}, 201)
+                            return ({'Message' : 'Category Created','status':201}, 201)
                         return ({'Message' : 'Category name already exists'}, 400)
                     return ({'Message' : 'Please enter a valid category description'}, 400)
                 return ({'Message' : 'Please enter a valid category name'}, 400)
@@ -348,7 +349,7 @@ class CategoryItem(Resource):
                                 category.cat_desc = data['cat_desc']
                                 category.modified_date = datetime.now()
                                 db.session.commit()
-                                return {'message':'Category Edited successfully'}
+                                return ({'message':'Category Edited successfully','status':201}, 201)
                             return ({'Message' : 'Category name already exists'}, 400)
                         return ({'Message' : 'Cannot edit recipe because there a recipes attached to it'}, 400)
                     return ({'Message' : 'Please enter a valid category description'}, 400)

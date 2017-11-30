@@ -13,7 +13,6 @@ def validate_email(email):
 def validate_text(text):
     """
     Make sure the user does not submit empty strings
-
     """
     stripped_value = str(text).strip()
     if len(stripped_value) == 0:
