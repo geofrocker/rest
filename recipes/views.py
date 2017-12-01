@@ -1,11 +1,10 @@
 """/rest_api views.py"""
 import uuid
-import jwt
-import re
-
-from flask import jsonify, make_response, request, redirect, session
 from datetime import datetime, timedelta
 from functools import wraps
+import jwt
+
+from flask import jsonify, make_response, request, redirect, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from flask_restful import Resource, marshal
@@ -15,9 +14,10 @@ from recipes.serializer import recipe_serializer, user_serializer, category_seri
 from recipes import api, db
 from recipes.models import User, Recipe, Category
 from recipes.models import save, delete
-from recipes.utils import validate_email, validate_text
+from recipes.utils import clean_recipe, clean_user, clean_category
 
 POSTS_PER_PAGE = 1
+
 
 def token_required(f):
     """
@@ -25,24 +25,27 @@ def token_required(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
- 
+        """
+        Ensure a user is logged in
+        """
         token = None
         if 'x-access-token' in request.headers:
             token = request.headers['x-access-token']
         if not token:
             return ({'Message': 'Unauthorised access! Please log in'}, 401)
         try:
-            
+
             data = jwt.decode(token, config('SECRET_KEY'))
-            
+
             current_user = User.query.filter_by(user_id=data['id']).first()
-        except:
-            return ({'message' : 'Invalid Token'}, 401)
+        except BaseException:
+            return ({'message': 'Invalid Token'}, 401)
         return f(current_user, *args, **kwargs)
     return decorated
 
 
 class RecipesList(Resource):
+    "Handle getting and creating recipes"
     def get(self):
         """
         Get all Recipes
@@ -52,32 +55,37 @@ class RecipesList(Resource):
         if page:
             page = int(page)
         if search:
-            recipes = Recipe.query.filter(Recipe.title.ilike('%' + search + '%'), Recipe.status.ilike('public')).all()
+            recipes = Recipe.query.filter(
+                Recipe.title.ilike(
+                    '%' + search + '%'),
+                Recipe.status.ilike('public')).all()
         elif page:
-            recipes = Recipe.query.filter_by(status='public').paginate(page, POSTS_PER_PAGE, False)
+            recipes = Recipe.query.filter_by(
+                status='public').paginate(
+                    page, POSTS_PER_PAGE, False)
             pages = recipes.pages
             has_prev = recipes.has_prev
             has_next = recipes.has_next
 
             if has_next:
                 next_page = request.url_root + "?" + \
-                        "page=" + str(page + 1)
+                    "page=" + str(page + 1)
             else:
                 next_page = 'Null'
 
             if has_prev:
                 previous_page = request.url_root + "?" + \
-                        "page=" + str(page - 1)
+                    "page=" + str(page - 1)
             else:
                 previous_page = 'Null'
             recipes = recipes.items
             if recipes:
                 recipe_list = marshal(recipes, recipe_serializer)
                 return ({"Recipe_list": recipe_list,
-                        "has_next": has_next,
-                        "total_pages": pages,
-                        "previous_page": previous_page,
-                        "next_page": next_page
+                         "has_next": has_next,
+                         "total_pages": pages,
+                         "previous_page": previous_page,
+                         "next_page": next_page
                         }, 200)
             else:
                 return ({'message': 'No recipes found'}, 404)
@@ -96,39 +104,31 @@ class RecipesList(Resource):
         Add a recipe to the database
         """
         data = request.get_json()
-        if data:
-            title = data.get('title')
-            ingredients = data.get('ingredients')
-            steps = data.get('steps')
-            status = data.get('status')
-            category = data.get('category')
-            if title and ingredients and steps and status and category:
-                if validate_text(data['title']):
-                    if validate_text(data['ingredients']):
-                        if validate_text(data['steps']):
-                            if data['status'] == 'public' or data['status'] == 'private':
-                                category = Category.query.filter_by(cat_name=data['category']).first()
-                                if category:
-                                    recipe_check=Recipe.query.filter_by(title=data['title']).first()
-                                    if not recipe_check:
-                                        new_recipe = Recipe(recipe_id=str(uuid.uuid4()), title=data['title'],
-                                                            category=data['category'],
-                                                            ingredients=data['ingredients'], steps=data['steps'],
-                                                            create_date=datetime.now(),
-                                                            created_by=current_user.username, modified_date=datetime.now(), status=data['status'])
-                                        save(new_recipe)
-                                        return ({'Message' : 'Recipe Created','status':201}, 201)
-                                    return ({'Message' : 'Title already exists'}, 400)
-                                return ({'Message' : 'Category does not exist'}, 400)
-                            return ({'Message' : 'The status should either be public or private'}, 400)
-                        return ({'Message' : 'Please enter valid steps'}, 400)
-                    return ({'Message' : 'Please enter valid ingredients'}, 400)
-                return ({'Message' : 'Please enter a valid title'}, 400)
-            return ({'Message' : 'Populate all the required fields'}, 400)
-        return ({'Message' : 'No data submitted'}, 400)
+        if not data:
+            return ({'Message': 'No data submitted'}, 400)
+        clean = clean_recipe(data)
+        if clean:
+            new_recipe = Recipe(
+                recipe_id=str(
+                    uuid.uuid4()),
+                title=data['title'],
+                category=data['category'],
+                ingredients=data['ingredients'],
+                steps=data['steps'],
+                create_date=datetime.now(),
+                created_by=current_user.username,
+                modified_date=datetime.now(),
+                status=data['status'])
+            save(new_recipe)
+            return ({'Message': 'Recipe Created', 'status': 201}, 201)
+        else:
+            return clean
 
 
 class RecipeItem(Resource):
+    """
+    Handle get,edit, and delete a recipe
+    """
     @token_required
     def get(current_user, self, id):
         """get on one recipe"""
@@ -138,108 +138,98 @@ class RecipeItem(Resource):
             return {"Recipe_Item": recipe_item}, 200
         else:
             return {'message': 'Recipe Not found'}, 404
+
     @token_required
     def put(current_user, self, id):
         """Edit a recipe by id"""
         data = request.get_json()
         recipe = Recipe.query.filter_by(recipe_id=id).first()
         if not recipe:
-            return ({'Message':'Recipe not available'}, 404)
-        if data:
-            title = data.get('title')
-            ingredients = data.get('ingredients')
-            steps = data.get('steps')
-            status = data.get('status')
-            category = data.get('category')
-            if title and ingredients and steps and status and category:
-                if validate_text(data['title']):
-                    if validate_text(data['ingredients']):
-                        if validate_text(data['steps']):
-                            if data['status'] == 'public' or data['status'] == 'private':
-                                category = Category.query.filter_by(cat_name=data['category']).first()
-                                if category:
-                                    recipe_check=Recipe.query.filter_by(title=data['title']).first()
-                                    if not recipe_check:
-                                        recipe.title = data['title']
-                                        recipe.category = data['category']
-                                        recipe.ingredients = data['ingredients']
-                                        recipe.modified_date = datetime.now()
-                                        recipe.steps = data['steps']
-                                        recipe.status = data['status']
-                                        db.session.commit()
-                                        return ({'Message':'Recipe Edited successfully','status':201}, 201)
-                                    return ({'Message' : 'Title already exists'}, 400)
-                                return ({'Message' : 'Category does not exist'}, 400)
-                            return ({'Message' : 'The status should either be public or private'}, 400)
-                        return ({'Message' : 'Please enter valid steps'}, 400)
-                    return ({'Message' : 'Please enter valid ingredients'}, 400)
-                return ({'Message' : 'Please enter a valid title'}, 400)
-            return ({'Message' : 'Populate all the required fields'}, 400)
-        return ({'Message' : 'No data submitted'}, 400)
+            return ({'Message': 'Recipe not available'}, 404)
+        if not data:
+            return ({'Message': 'No data submitted'}, 400)
+        clean = clean_recipe(data)
+        if clean:
+            recipe.title = data['title']
+            recipe.category = data['category']
+            recipe.ingredients = data['ingredients']
+            recipe.modified_date = datetime.now()
+            recipe.steps = data['steps']
+            recipe.status = data['status']
+            db.session.commit()
+            return ({'Message': 'Recipe Edited successfully', 'status': 201}, 201)
+        else:
+            return clean
 
     @token_required
     def delete(current_user, self, id):
         """Delete recipe by id"""
         recipe = Recipe.query.filter_by(recipe_id=id).first()
         if not recipe:
-            return ({'Message':'Recipe not available'}, 404)
+            return ({'Message': 'Recipe not available'}, 404)
         delete(recipe)
         return redirect("/myrecipes")
-        return ({'message':'Recipe Deleted successfully'}, 200)
-
 
 
 class AuthRegister(Resource):
+    """
+    Handle user registration
+    """
     def post(self):
         """Register New User"""
         data = request.get_json()
-        if data:
-            name = data.get('name')
-            username = data.get('username')
-            email = data.get('email')
-            password = data.get('password')
-            if name and username and email and password:
-                if validate_email(data['email']):
-                    if len(data['name']) > 3:
-                        if re.match("^[A-Za-z0-9_-]*$", data['username']):
-                            if len(data['password']) > 4:
-                                user_ckeck1 = User.query.filter_by(email=data['email']).first()
-                                user_ckeck2 = User.query.filter_by(username=data['username']).first()
-                                if not user_ckeck1:
-                                    if not user_ckeck2:
-                                        password_hash = generate_password_hash(data['password'], method='sha256')
-                                        new_user = User(user_id=str(uuid.uuid4()), name=data['name'], username=data['username'],
-                                                        email=data['email'], password=password_hash)
-                                        save(new_user)
-                                        return ({'Message':'Your are now registered! You can log in','status':201}, 201)
-                                    return ({'Message':'Username already exists'}, 200)
-                                return ({'Message':'Email already exists'}, 200)
-                            return ({'Message':'Password must be more than 4 characters'}, 200)
-                        return ({'Message':'Please enter a valid Username'}, 200)
-                    return ({'Message':'Please enter a valid name'}, 200)
-                return ({'Message':'Please enter a valid email'}, 200)
-            return ({'Message':'Populate all the fields'}, 200)
-        return ({'Message':'No data submitted'}, 200)
+        if not data:
+            return ({'Message': 'No data submitted'}, 401)
+        clean = clean_user(data)
+        if clean == True:
+            password_hash = generate_password_hash(
+                data['password'], method='sha256')
+            new_user = User(
+                user_id=str(
+                    uuid.uuid4()),
+                name=data['name'],
+                username=data['username'],
+                email=data['email'],
+                password=password_hash)
+            save(new_user)
+            return (
+                {'Message': 'Your are now registered! You can log in', 'status': 201}, 201)
+        else:
+            return clean
 
 
 class AuthLogin(Resource):
+    """
+    Handle user login
+    """
     def post(self):
         """Login a registerd user"""
         auth = request.get_json()
         if not auth or not auth['username'] or not auth['password']:
-            return make_response(jsonify(dict(error='Please enter your username and password')), 401)
+            return make_response(
+                jsonify(
+                    dict(
+                        error='Please enter your username and password')),
+                401)
         user = User.query.filter_by(username=auth['username']).first()
         if not user:
-            return make_response(jsonify(dict(error='User does not exist')), 401)
+            return make_response(
+                jsonify(
+                    dict(
+                        error='User does not exist')),
+                401)
 
         if check_password_hash(user.password, auth['password']):
-            token = jwt.encode({'id' : user.user_id, 'exp' : datetime.utcnow() + timedelta(minutes=6000)}, config('SECRET_KEY'))
-            return jsonify({'token' : token.decode('UTF-8')})
+            token = jwt.encode({'id': user.user_id, 'exp': datetime.utcnow(
+            ) + timedelta(minutes=6000)}, config('SECRET_KEY'))
+            return jsonify({'token': token.decode('UTF-8')})
         return make_response(jsonify(dict(error='Invalid password')), 401)
 
 
-
 class Users(Resource):
+    """
+    Handle getting users
+    """
     @token_required
     def get(current_user, self):
         """
@@ -254,6 +244,9 @@ class Users(Resource):
 
 
 class OneUser(Resource):
+    """
+    Handle getting and deleting a user
+    """
     @token_required
     def get(current_user, self, id):
         """
@@ -265,7 +258,7 @@ class OneUser(Resource):
             return ({"user_item": user_item}, 200)
         else:
             return ({'message': 'User not found'}, 404)
-    
+
     @token_required
     def delete(current_user, self, id):
         """
@@ -273,15 +266,20 @@ class OneUser(Resource):
         """
         user = User.query.filter_by(user_id=id).first()
         if not user:
-            return ({'Message':'User not available'}, 404)
-        connected_recipes = Recipe.query.filter_by(created_by=user.username).first()
+            return ({'Message': 'User not available'}, 404)
+        connected_recipes = Recipe.query.filter_by(
+            created_by=user.username).first()
         if not connected_recipes:
             delete(user)
-            return ({'Message':'User deleted'}, 200)
-        return ({'message': 'There are recipes attached to this user! Deletion failed'}, 401)
+            return ({'Message': 'User deleted'}, 200)
+        return (
+            {'message': 'There are recipes attached to this user! Deletion failed'}, 401)
+
 
 class CategoryList(Resource):
-    
+    """
+    Handle getting and creating categories
+    """
     def get(self):
         """
         Get all Categories
@@ -292,33 +290,35 @@ class CategoryList(Resource):
             return ({"Category_list": category_list}, 200)
         else:
             return ({'message': 'No categories found'}, 404)
+
     @token_required
     def post(current_user, self):
         """
         Add a category to the database
         """
         data = request.get_json()
-        if data:
-            cat_name = data.get('cat_name')
-            cat_desc = data.get('cat_desc')
-            if cat_name and cat_desc:
-                if validate_text(data['cat_name']):
-                    if validate_text(data['cat_desc']):
-                        category_check = Category.query.filter_by(cat_name=data['cat_name'], created_by=current_user.username).first()
-                        if not category_check:
-                            new_category = Category(cat_id=str(uuid.uuid4()), cat_name=data['cat_name'],
-                                                    cat_desc=data['cat_desc'], create_date=datetime.now(),
-                                                    created_by=current_user.username, modified_date=datetime.now())
-                            save(new_category)
-                            return ({'Message' : 'Category Created','status':201}, 201)
-                        return ({'Message' : 'Category name already exists'}, 400)
-                    return ({'Message' : 'Please enter a valid category description'}, 400)
-                return ({'Message' : 'Please enter a valid category name'}, 400)
-            return ({'Message' : 'Please populate all fields'}, 400)
-        return ({'Message' : 'No data submitted'}, 400)
+        if not data:
+            return ({'Message': 'No data submitted'}, 400)
+        clean = clean_category(data)
+        if clean:
+            new_category = Category(
+                cat_id=str(
+                    uuid.uuid4()),
+                cat_name=data['cat_name'],
+                cat_desc=data['cat_desc'],
+                create_date=datetime.now(),
+                created_by=current_user.username,
+                modified_date=datetime.now())
+            save(new_category)
+            return ({'Message': 'Category Created', 'status': 201}, 201)
+        else:
+            return clean
 
 
 class CategoryItem(Resource):
+    """
+    Handle getting, editing, and deleting a category
+    """
     @token_required
     def get(current_user, self, id):
         """get one category"""
@@ -328,6 +328,7 @@ class CategoryItem(Resource):
             return ({"Category_Item": category_item}, 200)
         else:
             return ({'message': 'Category Not found'}, 404)
+
     @token_required
     def put(current_user, self, id):
         """Edit a Category by id"""
@@ -335,27 +336,22 @@ class CategoryItem(Resource):
         category = Category.query.filter_by(cat_id=id).first()
         if not category:
             return ({'message': 'Category Not found'}, 404)
-        if data:
-            cat_name = data.get('cat_name')
-            cat_desc = data.get('cat_desc')
-            if cat_name and cat_desc:
-                if validate_text(data['cat_name']):
-                    if validate_text(data['cat_desc']):
-                        connected_recipes = Recipe.query.filter_by(category=category.cat_name).first()
-                        if not connected_recipes:
-                            category_check = Category.query.filter_by(cat_name=data['cat_name'], created_by=current_user.username).first()
-                            if not category_check:
-                                category.cat_name = data['cat_name']
-                                category.cat_desc = data['cat_desc']
-                                category.modified_date = datetime.now()
-                                db.session.commit()
-                                return ({'message':'Category Edited successfully','status':201}, 201)
-                            return ({'Message' : 'Category name already exists'}, 400)
-                        return ({'Message' : 'Cannot edit recipe because there a recipes attached to it'}, 400)
-                    return ({'Message' : 'Please enter a valid category description'}, 400)
-                return ({'Message' : 'Please enter a valid category name'}, 400)
-            return ({'Message' : 'Please populate all fields'}, 400)
-        return ({'Message' : 'No data submitted'}, 400)
+        if not data:
+            return ({'Message': 'No data submitted'}, 400)
+        clean = clean_category(data)
+        if clean:
+            connected_recipes = Recipe.query.filter_by(
+                category=category.cat_name).first()
+            if connected_recipes:
+                return (
+                    {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
+            category.cat_name = data['cat_name']
+            category.cat_desc = data['cat_desc']
+            category.modified_date = datetime.now()
+            db.session.commit()
+            return ({'message': 'Category Edited successfully', 'status': 201}, 201)
+        else:
+            return clean
 
     @token_required
     def delete(current_user, self, id):
@@ -363,42 +359,61 @@ class CategoryItem(Resource):
         category = Category.query.filter_by(cat_id=id).first()
         if not category:
             return ({'message': 'Category Not found'}, 404)
-        connected_recipes = Recipe.query.filter_by(category=category.cat_name).first()
+        connected_recipes = Recipe.query.filter_by(
+            category=category.cat_name).first()
         if not connected_recipes:
             delete(category)
-            return ({'message':'Category Deleted successfully'}, 200)
-        return ({'message':'Category has recipes attached to it. Deletion failed'}, 401)
+            return ({'message': 'Category Deleted successfully'}, 200)
+        return (
+            {'message': 'Category has recipes attached to it. Deletion failed'}, 401)
+
 
 class MyRecipes(Resource):
+    """
+    Get recipe for a logged in user. Both public and private
+    """
     @token_required
     def get(current_user, self, page=1):
         """
         Get all Recipes
         """
-        recipes = Recipe.query.filter_by(created_by=current_user.username).all()
+        recipes = Recipe.query.filter_by(
+            created_by=current_user.username).all()
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
             return ({"Recipe_list": recipe_list}, 200)
         else:
             return ({'message': 'No recipes found'}, 404)
 
+
 class Upvote(Resource):
+    """
+    Handle upvoting a recipe
+    """
     @token_required
     def get(current_user, self, id):
+        """
+        Get all votes for a particular recipe
+        """
         recipe = Recipe.query.filter_by(recipe_id=id).first()
         if not session.get('voted') and not session.get('voted_user') == id:
             recipe.upvotes = recipe.upvotes + 1
             db.session.commit()
             session['voted'] = True
             session['voted_recipe'] = id
-            return redirect("/"+id)
+            return redirect("/" + id)
         return ({'message': 'You have already voted'}, 404)
-        
 
 
 class Documentation(Resource):
+    """Handle documentation"""
     def get(self):
-        return redirect("https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#/")
+        """
+        Get the documentation from swagger
+        """
+        return redirect(
+            "https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#/")
+
 
 api.add_resource(Upvote, '/recipe/upvote/<id>')
 api.add_resource(MyRecipes, '/myrecipes')
