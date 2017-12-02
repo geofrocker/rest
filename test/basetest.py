@@ -51,6 +51,7 @@ class BaseTestCase(TestCase):
             'created_by': 'geom'}
 
         self.cat_test2 = {
+            'cat_name': 'Generall',
             'cat_id': '5xxxxxx',
             'created_by': 'geom'}
 

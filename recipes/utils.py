@@ -38,18 +38,19 @@ def clean_recipe(data):
     msg = ''
     if not(title and ingredients and steps and status and category):
         msg = msg + 'Populate all the required fields, '
-    if not validate_text(data['title']):
+    if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
-    if not validate_text(data['ingredients']):
+    if not validate_text(ingredients):
         msg = msg + 'Please enter valid ingredients, '
-    if not validate_text(data['steps']):
+    if not validate_text(steps):
         msg = msg + 'Please enter valid steps, '
     if not(status == 'public' or status == 'private'):
         msg = msg + 'The status should either be public or private, '
-    category = Category.query.filter_by(cat_name=data['category']).first()
+    category = Category.query.filter_by(cat_name=category).first()
     if not category:
         msg = msg + 'Category does not exist, '
-    recipe_check = Recipe.query.filter_by(title=data['title']).first()
+    title = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in title.split())
+    recipe_check = Recipe.query.filter_by(title=title).first()
     if recipe_check:
         msg = msg + 'Title already exists, '
     if msg:
@@ -72,12 +73,13 @@ def clean_user(data):
         msg = msg + 'Please enter a valid email, '
     if not len(name) > 3:
         msg = msg + 'Please enter a valid name, '
-    if not re.match("^[A-Za-z0-9_-]*$", data['username']):
+    if not re.match("^[A-Za-z0-9_-]*$", username):
         msg = msg + 'Please enter a valid Username, '
     if not len(password) > 4:
         msg = msg + 'Password must be more than 4 characters, '
-    user_check1 = User.query.filter_by(email=data['email']).first()
-    user_check2 = User.query.filter_by(username=data['username']).first()
+    user_check1 = User.query.filter_by(email=email).first()
+    username = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in username.split())
+    user_check2 = User.query.filter_by(username=username).first()
     if user_check1:
         msg = msg + 'Email already exists, '
     if user_check2:
@@ -100,6 +102,7 @@ def clean_category(data):
         msg = msg + 'Please enter a valid category name, '
     if not validate_text(cat_desc):
         msg = msg + 'Please enter a valid category description, '
+    cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in cat_name.split()),
     category_check = Category.query.filter_by(
         cat_name=cat_name).first()
     if category_check:

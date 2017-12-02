@@ -111,7 +111,7 @@ class RecipesList(Resource):
             new_recipe = Recipe(
                 recipe_id=str(
                     uuid.uuid4()),
-                title=data['title'],
+                title=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['title'].split()),
                 category=data['category'],
                 ingredients=data['ingredients'],
                 steps=data['steps'],
@@ -151,7 +151,7 @@ class RecipeItem(Resource):
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_recipe(data)
         if clean==True:
-            recipe.title = data['title']
+            recipe.title = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['title'].split())
             recipe.category = data['category']
             recipe.ingredients = data['ingredients']
             recipe.modified_date = datetime.now()
@@ -188,8 +188,8 @@ class AuthRegister(Resource):
             new_user = User(
                 user_id=str(
                     uuid.uuid4()),
-                name=data['name'],
-                username=data['username'],
+                name=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['name'].split()),
+                username=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['username'].split()),
                 email=data['email'],
                 password=password_hash)
             save(new_user)
@@ -305,7 +305,7 @@ class CategoryList(Resource):
             new_category = Category(
                 cat_id=str(
                     uuid.uuid4()),
-                cat_name=data['cat_name'],
+                cat_name=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['cat_name'].split()),
                 cat_desc=data['cat_desc'],
                 create_date=datetime.now(),
                 created_by=current_user.username,
@@ -346,7 +346,7 @@ class CategoryItem(Resource):
             if connected_recipes:
                 return (
                     {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
-            category.cat_name = data['cat_name']
+            category.cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['cat_name'].split())
             category.cat_desc = data['cat_desc']
             category.modified_date = datetime.now()
             db.session.commit()
