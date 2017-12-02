@@ -35,22 +35,25 @@ def clean_recipe(data):
     steps = data.get('steps')
     status = data.get('status')
     category = data.get('category')
+    msg = ''
     if not(title and ingredients and steps and status and category):
-        return ({'Message': 'Populate all the required fields'}, 400)
+        msg = msg + 'Populate all the required fields, '
     if not validate_text(data['title']):
-        return ({'Message': 'Please enter a valid title'}, 400)
+        msg = msg + 'Please enter a valid title, '
     if not validate_text(data['ingredients']):
-        return ({'Message': 'Please enter valid ingredients'}, 400)
+        msg = msg + 'Please enter valid ingredients, '
     if not validate_text(data['steps']):
-        return ({'Message': 'Please enter valid steps'}, 400)
-    if not(data['status'] == 'public' or data['status'] == 'private'):
-        return ({'Message': 'The status should either be public or private'}, 400)
+        msg = msg + 'Please enter valid steps, '
+    if not(status == 'public' or status == 'private'):
+        msg = msg + 'The status should either be public or private, '
     category = Category.query.filter_by(cat_name=data['category']).first()
     if not category:
-        return ({'Message': 'Category does not exist'}, 400)
+        msg = msg + 'Category does not exist, '
     recipe_check = Recipe.query.filter_by(title=data['title']).first()
     if recipe_check:
-        return ({'Message': 'Title already exists'}, 400)
+        msg = msg + 'Title already exists, '
+    if msg:
+        return ({'Message': msg}, 400)
     return True
 
 
@@ -62,22 +65,25 @@ def clean_user(data):
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    msg = ''
     if not (name and username and email and password):
-        return ({'Message': 'Populate all the fields'}, 400)
-    if not validate_email(data['email']):
-        return ({'Message': 'Please enter a valid email'}, 400)
-    if not len(data['name']) > 3:
-        return ({'Message': 'Please enter a valid name'}, 400)
+        msg = msg + 'Populate all the fields, '
+    if not validate_email(email):
+        msg = msg + 'Please enter a valid email, '
+    if not len(name) > 3:
+        msg = msg + 'Please enter a valid name, '
     if not re.match("^[A-Za-z0-9_-]*$", data['username']):
-        return ({'Message': 'Please enter a valid Username'}, 400)
-    if not len(data['password']) > 4:
-        return ({'Message': 'Password must be more than 4 characters'}, 400)
+        msg = msg + 'Please enter a valid Username, '
+    if not len(password) > 4:
+        msg = msg + 'Password must be more than 4 characters, '
     user_check1 = User.query.filter_by(email=data['email']).first()
     user_check2 = User.query.filter_by(username=data['username']).first()
     if user_check1:
-        return ({'Message': 'Email already exists'}, 400)
+        msg = msg + 'Email already exists, '
     if user_check2:
-        return ({'Message': 'Username already exists'}, 400)
+        msg = msg + 'Username already exists, '
+    if msg:
+        return ({'Message': msg}, 400)
     return True
 
 
@@ -87,14 +93,17 @@ def clean_category(data):
     """
     cat_name = data.get('cat_name')
     cat_desc = data.get('cat_desc')
+    msg = ''
     if not (cat_name and cat_desc):
-        return ({'Message': 'Please populate all fields'}, 400)
-    if not validate_text(data['cat_name']):
-        return ({'Message': 'Please enter a valid category name'}, 400)
-    if not validate_text(data['cat_desc']):
-        return ({'Message': 'Please enter a valid category description'}, 400)
+        msg = msg + 'Please populate all fields, '
+    if not validate_text(cat_name):
+        msg = msg + 'Please enter a valid category name, '
+    if not validate_text(cat_desc):
+        msg = msg + 'Please enter a valid category description, '
     category_check = Category.query.filter_by(
-        cat_name=data['cat_name']).first()
+        cat_name=cat_name).first()
     if category_check:
-        return ({'Message': 'Category name already exists'}, 400)
+        msg = msg + 'Category name already exists, '
+    if msg:
+        return ({'Message': msg}, 400)
     return True
