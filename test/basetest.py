@@ -49,6 +49,11 @@ class BaseTestCase(TestCase):
             'cat_name': 'Generall',
             'cat_desc': 'General recipes',
             'created_by': 'geom'}
+
+        self.cat_test2 = {
+            'cat_id': '5xxxxxx',
+            'created_by': 'geom'}
+
         test_category = Category(
             cat_id='5xxxxx',
             cat_name='General',
@@ -58,7 +63,6 @@ class BaseTestCase(TestCase):
             modified_date=datetime.now())
         save(test_category)
 
-        # create and add test recipe
         self.recipe_test = {
             'recipe_id': '5xxxxx',
             'title': 'Recipe One and two',
@@ -68,6 +72,14 @@ class BaseTestCase(TestCase):
             'created_by': 'geom',
             'status': 'public',
             'upvotes': 0}
+
+        self.recipe_test2 = {
+            'title': 'Recipe One and two',
+            'category': 'General',
+            'ingredients': 'Ingredient one and two',
+            'steps': 'step 1',
+            'upvotes': 0}
+
         test_recipe = Recipe(
             recipe_id='5xxxxx',
             title='Recipe One',

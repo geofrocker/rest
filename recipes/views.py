@@ -12,7 +12,7 @@ from decouple import config
 
 from recipes.serializer import recipe_serializer, user_serializer, category_serializer
 from recipes import api, db
-from recipes.models import User, Recipe, Category
+from recipes.models import User, Recipe, Category, UpVote, Review
 from recipes.models import save, delete
 from recipes.utils import clean_recipe, clean_user, clean_category
 
@@ -107,7 +107,7 @@ class RecipesList(Resource):
         if not data:
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_recipe(data)
-        if clean:
+        if clean==True:
             new_recipe = Recipe(
                 recipe_id=str(
                     uuid.uuid4()),
@@ -118,7 +118,8 @@ class RecipesList(Resource):
                 create_date=datetime.now(),
                 created_by=current_user.username,
                 modified_date=datetime.now(),
-                status=data['status'])
+                status=data['status'],
+                upvotes=0)
             save(new_recipe)
             return ({'Message': 'Recipe Created', 'status': 201}, 201)
         else:
@@ -149,7 +150,7 @@ class RecipeItem(Resource):
         if not data:
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_recipe(data)
-        if clean:
+        if clean==True:
             recipe.title = data['title']
             recipe.category = data['category']
             recipe.ingredients = data['ingredients']
@@ -210,20 +211,20 @@ class AuthLogin(Resource):
                 jsonify(
                     dict(
                         error='Please enter your username and password')),
-                401)
+                400)
         user = User.query.filter_by(username=auth['username']).first()
         if not user:
             return make_response(
                 jsonify(
                     dict(
                         error='User does not exist')),
-                401)
+                400)
 
         if check_password_hash(user.password, auth['password']):
             token = jwt.encode({'id': user.user_id, 'exp': datetime.utcnow(
             ) + timedelta(minutes=6000)}, config('SECRET_KEY'))
             return jsonify({'token': token.decode('UTF-8')})
-        return make_response(jsonify(dict(error='Invalid password')), 401)
+        return make_response(jsonify(dict(error='Invalid password')), 400)
 
 
 class Users(Resource):
@@ -300,7 +301,7 @@ class CategoryList(Resource):
         if not data:
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_category(data)
-        if clean:
+        if clean==True:
             new_category = Category(
                 cat_id=str(
                     uuid.uuid4()),
@@ -339,7 +340,7 @@ class CategoryItem(Resource):
         if not data:
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_category(data)
-        if clean:
+        if clean==True:
             connected_recipes = Recipe.query.filter_by(
                 category=category.cat_name).first()
             if connected_recipes:
@@ -396,13 +397,42 @@ class Upvote(Resource):
         Get all votes for a particular recipe
         """
         recipe = Recipe.query.filter_by(recipe_id=id).first()
-        if not session.get('voted') and not session.get('voted_user') == id:
-            recipe.upvotes = recipe.upvotes + 1
-            db.session.commit()
-            session['voted'] = True
-            session['voted_recipe'] = id
+        voted = UpVote.query.filter_by(recipe_id=id, created_by=current_user.username).first()
+        if voted:
+            return ({'message': 'You have already voted'}, 401)
+        recipe.upvotes = 0 + 1
+        db.session.commit()
+        new_vote = UpVote(
+            vote_id=str(
+                uuid.uuid4()),
+            recipe_id=id,
+            create_date=datetime.now(),
+            created_by=current_user.username)
+        save(new_vote)
+        return redirect("/" + id)
+
+class Reviews(Resource):
+    """
+    Handle reviewing a recipe
+    """
+    @token_required
+    def post(current_user, self, id):
+        """
+        Review a particular recipe
+        """
+        recipe = Recipe.query.filter_by(recipe_id=id).first()
+        data = request.get_json()
+        if data.get('content'):
+            new_review = Review(
+                review_id = str(
+                    uuid.uuid4()),
+                content = data['content'],
+                recipe_id=id,
+                create_date=datetime.now(),
+                created_by=current_user.username)
+            save(new_review)
             return redirect("/" + id)
-        return ({'message': 'You have already voted'}, 404)
+        return ({'message': 'No review submitted'}, 401)
 
 
 class Documentation(Resource):
@@ -416,6 +446,7 @@ class Documentation(Resource):
 
 
 api.add_resource(Upvote, '/recipe/upvote/<id>')
+api.add_resource(Reviews, '/recipe/review/<id>')
 api.add_resource(MyRecipes, '/myrecipes')
 api.add_resource(RecipesList, '/')
 api.add_resource(RecipeItem, '/<id>')

@@ -63,21 +63,21 @@ def clean_user(data):
     email = data.get('email')
     password = data.get('password')
     if not (name and username and email and password):
-        return ({'Message': 'Populate all the fields'}, 200)
+        return ({'Message': 'Populate all the fields'}, 400)
     if not validate_email(data['email']):
-        return ({'Message': 'Please enter a valid email'}, 200)
+        return ({'Message': 'Please enter a valid email'}, 400)
     if not len(data['name']) > 3:
-        return ({'Message': 'Please enter a valid name'}, 200)
+        return ({'Message': 'Please enter a valid name'}, 400)
     if not re.match("^[A-Za-z0-9_-]*$", data['username']):
-        return ({'Message': 'Please enter a valid Username'}, 200)
+        return ({'Message': 'Please enter a valid Username'}, 400)
     if not len(data['password']) > 4:
-        return ({'Message': 'Password must be more than 4 characters'}, 200)
+        return ({'Message': 'Password must be more than 4 characters'}, 400)
     user_check1 = User.query.filter_by(email=data['email']).first()
     user_check2 = User.query.filter_by(username=data['username']).first()
     if user_check1:
-        return ({'Message': 'Email already exists'}, 200)
+        return ({'Message': 'Email already exists'}, 400)
     if user_check2:
-        return ({'Message': 'Username already exists'}, 200)
+        return ({'Message': 'Username already exists'}, 400)
     return True
 
 

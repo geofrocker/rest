@@ -39,8 +39,10 @@ class Recipe(db.Model):
         db.ForeignKey('User.username'),
         nullable=True)
     status = db.Column(db.String, default='public')
-    upvotes = db.Column(db.Integer, default=0)
-    reviews = db.relationship("Review", backref='recipe', lazy='dynamic',
+    upvotes = db.Column(db.Integer)
+    reviews_rel = db.relationship("Review", backref='recipe', lazy='dynamic',
+                              cascade="delete, delete-orphan")
+    upvotes_rel = db.relationship("UpVote", backref='recipe', lazy='dynamic',
                               cascade="delete, delete-orphan")
 
     def __repr__(self):
@@ -67,7 +69,6 @@ class Category(db.Model):
 
 # Create review model
 
-
 class Review(db.Model):
     """
     Handle reviews made on recipes
@@ -88,10 +89,29 @@ class Review(db.Model):
     def __repr__(self):
         return '%r' % self.content
 
+class UpVote(db.Model):
+    """
+    Handle upvotes made on recipes
+    """
+    __tablename__ = "UpVote"
+    vote_id = db.Column(db.String(120), primary_key=True)
+    recipe_id = db.Column(
+        db.String,
+        db.ForeignKey('Recipe.recipe_id'),
+        nullable=True)
+    create_date = db.Column(db.DateTime)
+    created_by = db.Column(
+        db.String,
+        db.ForeignKey('User.username'),
+        nullable=True)
+
+    def __repr__(self):
+        return '%r' % self.vote_id
+
 
 def save(model_instance):
     """
-    method used for adding categories
+    method used for saving
     """
     db.session.add(model_instance)
     db.session.commit()
@@ -99,7 +119,7 @@ def save(model_instance):
 
 def delete(model_instance):
     """
-    method used for deleting categories
+    method used for deleting
     """
     db.session.delete(model_instance)
     db.session.commit()
