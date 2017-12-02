@@ -45,7 +45,7 @@ $ python manage.py db upgrade
 # For Testing purposes
   * I recommend that you install Postman from [here](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en)
   * This will help you to test the api efficiently. click [here](https://www.getpostman.com/postman) to get started
-
+Get the full documentation [here](https://app.swaggerhub.com/apis/Geeks4lif/YummyRecipesRet/1.0.0#)
 EndPoint | Functionality
 ------------ | -------------
 POST /auth/login | Logs a user in and generates a unique token
