@@ -10,3 +10,4 @@ config.py
 venv/
 *.pyc
 migrations/
+.DS_Store
