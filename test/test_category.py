@@ -30,6 +30,20 @@ class TestCategory(BaseTestCase):
         self.assertIn('Please populate all fields', str(response.data))
         self.assertEqual(response.status_code, 400)
 
+    def test_post_category_with_invalid_data(self):
+        response = self.client.post('/category', data=json.dumps(self.cat_test3),
+                                     headers=self.headers)
+        self.assertIn('Please populate all fields', str(response.data))
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_category_with_same_name(self):
+        self.client.post('/category', data=json.dumps(self.cat_test),
+                                     headers=self.headers)
+        response = self.client.post('/category', data=json.dumps(self.cat_test),
+                                     headers=self.headers)
+        self.assertIn('Category name already exists', str(response.data))
+        self.assertEqual(response.status_code, 400)
+
 class TestCategoryActivity(BaseTestCase):
     def test_get_category(self):
         response = self.client.get('/category/5xxxxx', headers=self.headers)

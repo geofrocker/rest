@@ -14,7 +14,7 @@ class User(db.Model):
     password = db.Column(db.String(120))
 
     def __repr__(self):
-        return '%r' % self.recipe_id
+        return '%r' % self.user_id
 
 # Create Recipe database model
 

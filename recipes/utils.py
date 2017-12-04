@@ -38,6 +38,7 @@ def clean_recipe(data):
     msg = ''
     if not(title and ingredients and steps and status and category):
         msg = msg + 'Populate all the required fields, '
+        return ({'Message': msg}, 400)
     if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
     if not validate_text(ingredients):
@@ -69,6 +70,7 @@ def clean_user(data):
     msg = ''
     if not (name and username and email and password):
         msg = msg + 'Populate all the fields, '
+        return ({'Message': msg}, 400)
     if not validate_email(email):
         msg = msg + 'Please enter a valid email, '
     if not len(name) > 3:
@@ -98,6 +100,7 @@ def clean_category(data):
     msg = ''
     if not (cat_name and cat_desc):
         msg = msg + 'Please populate all fields, '
+        return ({'Message': msg}, 400)
     if not validate_text(cat_name):
         msg = msg + 'Please enter a valid category name, '
     if not validate_text(cat_desc):

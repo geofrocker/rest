@@ -217,7 +217,7 @@ class AuthLogin(Resource):
             return make_response(
                 jsonify(
                     dict(
-                        error='User does not exist')),
+                        error='User does not exist, Make sure username starts with an Upper case letter')),
                 400)
 
         if check_password_hash(user.password, auth['password']):

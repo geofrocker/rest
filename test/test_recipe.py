@@ -53,6 +53,29 @@ class TestRecipeActivity(BaseTestCase):
         self.assertIn('Recipe Created', str(response.data))
         self.assertEqual(response.status_code, 201)
 
+    def test_add_with_unclean_data(self):
+        response = self.client.post(
+            '/',
+            data=json.dumps(
+                self.recipe_test3),
+            headers=self.headers)
+        self.assertIn('Populate all the required', str(response.data))
+        self.assertEqual(response.status_code, 400)
+
+    def test_add_with_an_existing_title(self):
+        self.client.post(
+            '/',
+            data=json.dumps(
+                self.recipe_test),
+            headers=self.headers)
+        response = self.client.post(
+            '/',
+            data=json.dumps(
+                self.recipe_test4),
+            headers=self.headers)
+        self.assertIn('Title already exists', str(response.data))
+        self.assertEqual(response.status_code, 400)
+
     def test_no_data_submitted(self):
         response = self.client.post(
             '/',
