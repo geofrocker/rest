@@ -9,4 +9,5 @@ config.py
 .env
 venv/
 *.pyc
+migrations/
 .DS_Store
