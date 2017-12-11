@@ -207,7 +207,7 @@ class AuthLogin(Resource):
     def post(self):
         """Login a registerd user"""
         auth = request.get_json()
-        if not auth or not auth['username'] or not auth['password']:
+        if not auth or not auth.get('username') or not auth.get('password'):
             return make_response(
                 jsonify(
                     dict(
