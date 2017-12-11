@@ -10,11 +10,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_restful import Resource, marshal
 from decouple import config
 
-from recipes.serializer import recipe_serializer, user_serializer, category_serializer
+from recipes.serializer import recipe_serializer, user_serializer, category_serializer, review_serializer
 from recipes import api, db
 from recipes.models import User, Recipe, Category, UpVote, Review
 from recipes.models import save, delete
-from recipes.utils import clean_recipe, clean_user, clean_category
+from recipes.utils import clean_recipe, clean_user, clean_category, text_to_title_case
 
 POSTS_PER_PAGE = 1
 
@@ -110,8 +110,8 @@ class RecipesList(Resource):
         if clean==True:
             new_recipe = Recipe(
                 recipe_id=str(
-                    uuid.uuid4()),
-                title=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['title'].split()),
+                    uuid.uuid4()),   
+                title=text_to_title_case(data['title']),
                 category=data['category'],
                 ingredients=data['ingredients'],
                 steps=data['steps'],
@@ -119,7 +119,8 @@ class RecipesList(Resource):
                 created_by=current_user.username,
                 modified_date=datetime.now(),
                 status=data['status'],
-                upvotes=0)
+                upvotes=0,
+                reviews=0)
             save(new_recipe)
             return ({'Message': 'Recipe Created', 'status': 201}, 201)
         else:
@@ -151,7 +152,7 @@ class RecipeItem(Resource):
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_recipe(data)
         if clean==True:
-            recipe.title = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['title'].split())
+            recipe.title = text_to_title_case(data['title'])
             recipe.category = data['category']
             recipe.ingredients = data['ingredients']
             recipe.modified_date = datetime.now()
@@ -169,7 +170,7 @@ class RecipeItem(Resource):
         if not recipe:
             return ({'Message': 'Recipe not available'}, 404)
         delete(recipe)
-        return redirect("/myrecipes")
+        return ({'Message': 'Recipe deleted successfully'}, 200)
 
 
 class AuthRegister(Resource):
@@ -188,8 +189,8 @@ class AuthRegister(Resource):
             new_user = User(
                 user_id=str(
                     uuid.uuid4()),
-                name=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['name'].split()),
-                username=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['username'].split()),
+                name=text_to_title_case(data['name']),
+                username=text_to_title_case(data['username']),
                 email=data['email'],
                 password=password_hash)
             save(new_user)
@@ -281,7 +282,8 @@ class CategoryList(Resource):
     """
     Handle getting and creating categories
     """
-    def get(self):
+    @token_required
+    def get(current_user, self):
         """
         Get all Categories
         """
@@ -305,7 +307,7 @@ class CategoryList(Resource):
             new_category = Category(
                 cat_id=str(
                     uuid.uuid4()),
-                cat_name=' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['cat_name'].split()),
+                cat_name=text_to_title_case(data['cat_name']),
                 cat_desc=data['cat_desc'],
                 create_date=datetime.now(),
                 created_by=current_user.username,
@@ -346,7 +348,7 @@ class CategoryItem(Resource):
             if connected_recipes:
                 return (
                     {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
-            category.cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data['cat_name'].split())
+            category.cat_name = text_to_title_case(data['cat_name'])
             category.cat_desc = data['cat_desc']
             category.modified_date = datetime.now()
             db.session.commit()
@@ -399,7 +401,7 @@ class Upvote(Resource):
         recipe = Recipe.query.filter_by(recipe_id=id).first()
         voted = UpVote.query.filter_by(recipe_id=id, created_by=current_user.username).first()
         if voted:
-            return ({'message': 'You have already voted'}, 401)
+            return ({'message': 'You have already voted'}, 400)
         recipe.upvotes = 0 + 1
         db.session.commit()
         new_vote = UpVote(
@@ -409,7 +411,7 @@ class Upvote(Resource):
             create_date=datetime.now(),
             created_by=current_user.username)
         save(new_vote)
-        return redirect("/" + id)
+        return ({'Message': 'Thank you for voting'}, 400)
 
 class Reviews(Resource):
     """
@@ -431,8 +433,20 @@ class Reviews(Resource):
                 create_date=datetime.now(),
                 created_by=current_user.username)
             save(new_review)
-            return redirect("/" + id)
+            return ({'message': 'Thank you! for your review', 'status': 201}, 201)
         return ({'message': 'No review submitted'}, 401)
+
+    @token_required
+    def get(current_user, self, id):
+        """
+        Get reviews for a particular recipe
+        """
+        reviews = Review.query.filter_by(recipe_id=id).all()
+        if reviews:
+            review_list = marshal(reviews, review_serializer)
+            return ({"Review_list": review_list}, 200)
+        else:
+            return ({"message": "This recipe has no reviews..Be the first one to review!"}, 404)
 
 
 class Documentation(Resource):

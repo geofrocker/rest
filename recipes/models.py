@@ -40,6 +40,7 @@ class Recipe(db.Model):
         nullable=True)
     status = db.Column(db.String, default='public')
     upvotes = db.Column(db.Integer)
+    reviews = db.Column(db.Integer)
     reviews_rel = db.relationship("Review", backref='recipe', lazy='dynamic',
                               cascade="delete, delete-orphan")
     upvotes_rel = db.relationship("UpVote", backref='recipe', lazy='dynamic',

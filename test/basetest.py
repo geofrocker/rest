@@ -96,14 +96,16 @@ class BaseTestCase(TestCase):
             'steps': 'step 1',
             'created_by': 'geom',
             'status': 'public',
-            'upvotes': 0}
+            'upvotes': 0,
+            'reviews': 0}
 
         self.recipe_test2 = {
             'title': 'Recipe One and two',
             'category': 'General',
             'ingredients': 'Ingredient one and two',
             'steps': 'step 1',
-            'upvotes': 0}
+            'upvotes': 0,
+            'reviews': 0}
         
         self.recipe_test3 = {
             'recipe_id': '5xxxxx',
@@ -113,7 +115,8 @@ class BaseTestCase(TestCase):
             'steps': '',
             'created_by': '',
             'status': 'publjkjkic',
-            'upvotes': 0}
+            'upvotes': 0,
+            'reviews': 0}
 
         self.recipe_test4 = {
             'recipe_id': '5xxxxx44',
@@ -123,7 +126,8 @@ class BaseTestCase(TestCase):
             'steps': 'step 1',
             'created_by': 'geom',
             'status': 'public',
-            'upvotes': 0}
+            'upvotes': 0,
+            'reviews': 0}
 
 
         test_recipe = Recipe(
@@ -136,7 +140,8 @@ class BaseTestCase(TestCase):
             created_by='geof',
             modified_date=datetime.now(),
             status='public',
-            upvotes=0)
+            upvotes=0,
+            reviews=0)
         save(test_recipe)
 
         #Generate authentication token

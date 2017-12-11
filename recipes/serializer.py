@@ -11,6 +11,7 @@ recipe_serializer = {
     "created_by": fields.String,
     "modified_date": fields.DateTime,
     "upvotes": fields.Integer,
+    "reviews": fields.Integer,
     "status": fields.String
 }
 
@@ -29,4 +30,12 @@ user_serializer = {
     "username": fields.String,
     "email": fields.String,
     "password": fields.String,
+}
+
+review_serializer = {
+    "review_id": fields.String,
+    "content": fields.String,
+    "recipe_id": fields.String,
+    "create_date": fields.String,
+    "created_by": fields.String,
 }
