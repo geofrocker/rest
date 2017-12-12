@@ -110,9 +110,6 @@ def clean_category(data):
     if not (cat_name and cat_desc):
         msg = msg + 'Please populate all fields, '
         return ({'Message': msg}, 400)
-    if int(cat_name) and int(cat_desc):
-        msg = msg + 'Category name or description cannot be an integer, '
-        return ({'Message': msg}, 400)
     if not validate_text(cat_name):
         msg = msg + 'Please enter a valid category name, '
     if not validate_text(cat_desc):
