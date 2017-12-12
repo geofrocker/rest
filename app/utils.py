@@ -1,7 +1,7 @@
 """Handle all the user validation"""
 import re
 
-from recipes.models import User, Recipe, Category
+from app.models import User, Recipe, Category
 
 
 def validate_email(email):

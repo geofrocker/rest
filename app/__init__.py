@@ -15,4 +15,4 @@ app.config['SECRET_KEY'] = config('SECRET_KEY') or os.environ['SECRET_KEY']
 
 db = SQLAlchemy(app)
 api = Api(app)
-from recipes import views
+from app import views

@@ -10,11 +10,11 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_restful import Resource, marshal
 from decouple import config
 
-from recipes.serializer import recipe_serializer, user_serializer, category_serializer, review_serializer
-from recipes import api, db
-from recipes.models import User, Recipe, Category, UpVote, Review
-from recipes.models import save, delete
-from recipes.utils import clean_recipe, clean_user, clean_category, text_to_title_case
+from app.serializer import recipe_serializer, user_serializer, category_serializer, review_serializer
+from app import api, db
+from app.models import User, Recipe, Category, UpVote, Review
+from app.models import save, delete
+from app.utils import clean_recipe, clean_user, clean_category, text_to_title_case
 
 POSTS_PER_PAGE = 1
 

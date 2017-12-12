@@ -7,9 +7,9 @@ from unittest import TestCase
 from werkzeug.security import generate_password_hash
 from decouple import config
 
-from recipes import app, db
-from recipes.models import User, Recipe, Category, Review, UpVote
-from recipes.models import save
+from app import app, db
+from app.models import User, Recipe, Category, Review, UpVote
+from app.models import save
 
 
 class BaseTestCase(TestCase):
