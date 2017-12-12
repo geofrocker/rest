@@ -47,9 +47,6 @@ def clean_recipe(data):
     if not(title and ingredients and steps and status and category):
         msg = msg + 'Populate all the required fields, '
         return ({'Message': msg}, 400)
-    if int(title) and int(ingredients) and int(steps) and int(status) and int(category):
-        msg = msg + 'Check your fields for integers, '
-        return ({'Message': msg}, 400)
     if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
     if not validate_text(ingredients):
