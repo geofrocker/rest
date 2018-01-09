@@ -8,12 +8,8 @@ def validate_email(email):
     """
     Validate user email
     """
-    if len(email) > 7:
-        
-        if re.match(
-                "^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$",
-                email) is not None:
-            return True
+    if re.match("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$",email) is not None:
+        return True
     return False
 
 
@@ -43,6 +39,7 @@ def clean_recipe(data):
     steps = data.get('steps')
     status = data.get('status')
     category = data.get('category')
+    category = text_to_title_case(category)
     msg = ''
     if not(title and ingredients and steps and status and category):
         msg = msg + 'Populate all the required fields, '
@@ -80,6 +77,7 @@ def clean_user(data):
         msg = msg + 'Populate all the fields, '
     if isinstance(name, int) or isinstance(username, int) or isinstance(email, int) or isinstance(password, int):
         msg = msg + 'Check your fields for integers, '
+        return ({'Message': msg}, 400)
     if not validate_email(email):
         msg = msg + 'Please enter a valid email, '
     if not len(name) > 3:
