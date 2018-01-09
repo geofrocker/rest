@@ -1,6 +1,6 @@
 import json
 
-from recipes import app, db
+from app import app, db
 from .basetest import BaseTestCase
 
 class TestCategory(BaseTestCase):
@@ -11,9 +11,9 @@ class TestCategory(BaseTestCase):
         """
         Test  get category 
         """
-            response = self.client.get('/category', headers=self.headers)
-            self.assertIn('General recpes', str(response.data))
-            self.assertEqual(response.status, "200 OK")
+        response = self.client.get('/category', headers=self.headers)
+        self.assertIn('General recpes', str(response.data))
+        self.assertEqual(response.status, "200 OK")
 
     def test_post_category(self):
         """

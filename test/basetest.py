@@ -37,6 +37,10 @@ class BaseTestCase(TestCase):
 
         self.user_test2 = {
             'user_id': '5xxxxx',
+            'email':'jhfj',
+            'name':'jkdskj',
+            'username':'jhkhksc',
+            'password':'ghjkhgjk'
            }
         
         self.user_test3 = {

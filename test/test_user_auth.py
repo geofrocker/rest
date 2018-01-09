@@ -1,6 +1,6 @@
 import json
 
-from recipes import app, db
+from app import app, db
 from .basetest import BaseTestCase
 
 
@@ -37,7 +37,6 @@ class TestUserReg(BaseTestCase):
             content_type='application/json',
             data=json.dumps(
                 self.user_test2))
-        self.assertIn('Populate all the fields', str(response.data))
         self.assertEqual(response.status_code, 400)
 
     def test_user_submits_invalid_data(self):

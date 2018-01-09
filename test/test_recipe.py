@@ -1,6 +1,6 @@
 import json
 
-from recipes import app, db
+from app import app, db
 from .basetest import BaseTestCase
 
 class TestGetRecipe(BaseTestCase):
@@ -159,8 +159,8 @@ class TestRecipeActivity(BaseTestCase):
         response = self.client.get(
             '/recipe/upvote/5xxxxx',
             headers=self.headers)
-        self.assertIn('You should be redirected automatically', str(response.data))
-        self.assertEqual(response.status_code, 302)
+        self.assertIn('Thank you for voting', str(response.data))
+        self.assertEqual(response.status_code, 201)
 
     def test_review_a_recipe(self):
         """
@@ -170,8 +170,8 @@ class TestRecipeActivity(BaseTestCase):
             '/recipe/review/5xxxxx',
             data=json.dumps({'content':'My review'}),
             headers=self.headers)
-        self.assertIn('You should be redirected automatically', str(response.data))
-        self.assertEqual(response.status_code, 302)
+        self.assertIn('Thank you! for your review', str(response.data))
+        self.assertEqual(response.status_code, 201)
 
     def test_edit_unavilable_recipe(self): 
         """
@@ -194,8 +194,8 @@ class TestRecipeActivity(BaseTestCase):
             data=json.dumps(
                 self.recipe_test),
             headers=self.headers)
-        self.assertIn('You should be redirected automatically', str(response.data))
-        self.assertEqual(response.status_code, 302)
+        self.assertIn('Recipe deleted successfully', str(response.data))
+        self.assertEqual(response.status_code, 200)
 
     def test_delete_unavilable_recipe(self):
         """

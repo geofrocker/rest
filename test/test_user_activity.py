@@ -1,6 +1,6 @@
 import json
 
-from recipes import app, db
+from app import app, db
 from .basetest import BaseTestCase
 
 class TestGetUsers(BaseTestCase):
