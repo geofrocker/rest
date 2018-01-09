@@ -16,7 +16,7 @@ from app.models import User, Recipe, Category, UpVote, Review
 from app.models import save, delete
 from app.utils import clean_recipe, clean_user, clean_category, text_to_title_case
 
-POSTS_PER_PAGE = 1
+POSTS_PER_PAGE = 2
 
 
 def token_required(f):
@@ -52,6 +52,9 @@ class RecipesList(Resource):
         """
         search = request.args.get('q')
         page = request.args.get('page')
+        category = request.args.get('category')
+        if category:
+            category = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in category.split()),
         if page:
             page = int(page)
         if search:
@@ -59,6 +62,12 @@ class RecipesList(Resource):
                 Recipe.title.ilike(
                     '%' + search + '%'),
                 Recipe.status.ilike('public')).all()
+            rec = Recipe.query.filter(
+                Recipe.category.ilike(
+                    '%' + search + '%'),
+                Recipe.status.ilike('public')).all()
+            if rec:
+                recipes = rec
         elif page:
             recipes = Recipe.query.filter_by(
                 status='public').paginate(
@@ -89,7 +98,8 @@ class RecipesList(Resource):
                         }, 200)
             else:
                 return ({'message': 'No recipes found'}, 404)
-
+        elif category:
+            recipes = Recipe.query.filter_by(category=category, status='public').all()
         else:
             recipes = Recipe.query.filter_by(status='public').all()
         if recipes:
@@ -112,7 +122,7 @@ class RecipesList(Resource):
                 recipe_id=str(
                     uuid.uuid4()),   
                 title=text_to_title_case(data['title']),
-                category=data['category'],
+                category=text_to_title_case(data['category']),
                 ingredients=data['ingredients'],
                 steps=data['steps'],
                 create_date=datetime.now(),
@@ -400,7 +410,9 @@ class Upvote(Resource):
         """
         recipe = Recipe.query.filter_by(recipe_id=id).first()
         voted = UpVote.query.filter_by(recipe_id=id, created_by=current_user.username).first()
-        if voted:
+        if not recipe:
+            return ({'message': 'Recipe does not exist'}, 404)
+        if voted and recipe:
             return ({'message': 'You have already voted'}, 400)
         recipe.upvotes = 0 + 1
         db.session.commit()
@@ -411,7 +423,7 @@ class Upvote(Resource):
             create_date=datetime.now(),
             created_by=current_user.username)
         save(new_vote)
-        return ({'Message': 'Thank you for voting'}, 400)
+        return ({'message': 'Thank you for voting'}, 201)
 
 class Reviews(Resource):
     """
@@ -423,6 +435,8 @@ class Reviews(Resource):
         Review a particular recipe
         """
         recipe = Recipe.query.filter_by(recipe_id=id).first()
+        if not recipe:
+            return ({'message': 'Recipe does not exist'}, 404)
         data = request.get_json()
         if data.get('content'):
             new_review = Review(
@@ -433,7 +447,9 @@ class Reviews(Resource):
                 create_date=datetime.now(),
                 created_by=current_user.username)
             save(new_review)
-            return ({'message': 'Thank you! for your review', 'status': 201}, 201)
+            review = marshal(new_review,review_serializer)
+            message = 'Thank you! for your review'
+            return ({'review':review, 'message':message}, 201)
         return ({'message': 'No review submitted'}, 401)
 
     @token_required
