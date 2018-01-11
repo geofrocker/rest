@@ -439,6 +439,8 @@ class Reviews(Resource):
             return ({'message': 'Recipe does not exist'}, 404)
         data = request.get_json()
         if data.get('content'):
+            recipe.reviews = 0 + 1
+            db.session.commit()
             new_review = Review(
                 review_id = str(
                     uuid.uuid4()),
