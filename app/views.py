@@ -460,9 +460,11 @@ class Reviews(Resource):
         Get reviews for a particular recipe
         """
         reviews = Review.query.filter_by(recipe_id=id).all()
+        recipe =Recipe.query.filter_by(recipe_id=id).first()
         if reviews:
             review_list = marshal(reviews, review_serializer)
-            return ({"Review_list": review_list}, 200)
+            recipe = marshal(recipe, recipe_serializer)
+            return ({"Review_list": review_list, "Recipe":recipe}, 200)
         else:
             return ({"message": "This recipe has no reviews..Be the first one to review!"}, 404)
 
