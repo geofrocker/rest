@@ -45,7 +45,7 @@ def clean_recipe(data):
         msg = msg + 'Populate all the required fields, '
         return ({'Message': msg}, 400)
     if not(category):
-        msg = msg + 'Add atleast one category before cereating a recipe, '
+        msg = msg + 'Add atleast one category before creating a recipe, '
         return ({'Message': msg}, 400)
     if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
