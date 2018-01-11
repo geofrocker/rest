@@ -3,7 +3,7 @@ import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from app import db, app
-MIGRATION_DIR = os.path.join('migrations')
+MIGRATION_DIR = os.path.join('app/migrations')
 migrate = Migrate(app, db, directory=MIGRATION_DIR)
 manager = Manager(app)
 

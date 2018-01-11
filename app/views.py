@@ -297,8 +297,7 @@ class CategoryList(Resource):
         """
         Get all Categories
         """
-        categories = Category.query.filter_by(
-            created_by=current_user.username).all()
+        categories = Category.query.all()
         if categories:
             category_list = marshal(categories, category_serializer)
             return ({"Category_list": category_list}, 200)
@@ -315,12 +314,6 @@ class CategoryList(Resource):
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_category(data)
         if clean==True:
-            cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data.get('cat_name').split())
-            category_check = Category.query.filter_by(
-                cat_name=cat_name, created_by=current_user.username).all()
-            if category_check:
-                msg = 'Category name already exists'
-                return ({'Message': msg}, 400)
             new_category = Category(
                 cat_id=str(
                     uuid.uuid4()),
