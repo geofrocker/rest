@@ -41,8 +41,11 @@ def clean_recipe(data):
     category = data.get('category')
     category = text_to_title_case(category)
     msg = ''
-    if not(title and ingredients and steps and status and category):
+    if not(title and ingredients and steps and status):
         msg = msg + 'Populate all the required fields, '
+        return ({'Message': msg}, 400)
+    if not(category):
+        msg = msg + 'Add atleast one category before cereating a recipe, '
         return ({'Message': msg}, 400)
     if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
