@@ -450,8 +450,9 @@ class Reviews(Resource):
                 created_by=current_user.username)
             save(new_review)
             review = marshal(new_review,review_serializer)
+            recipe = marshal(recipe, recipe_serializer)
             message = 'Thank you! for your review'
-            return ({'review':review, 'message':message}, 201)
+            return ({'review':review, 'Recipe':recipe, 'message':message}, 201)
         return ({'message': 'No review submitted'}, 401)
 
     @token_required
@@ -463,8 +464,7 @@ class Reviews(Resource):
         recipe =Recipe.query.filter_by(recipe_id=id).first()
         if reviews:
             review_list = marshal(reviews, review_serializer)
-            recipe = marshal(recipe, recipe_serializer)
-            return ({"Review_list": review_list, "Recipe":recipe}, 200)
+            return ({"Review_list": review_list,}, 200)
         else:
             return ({"message": "This recipe has no reviews..Be the first one to review!"}, 404)
 
