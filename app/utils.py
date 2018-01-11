@@ -115,11 +115,6 @@ def clean_category(data):
         msg = msg + 'Please enter a valid category name, '
     if not validate_text(cat_desc):
         msg = msg + 'Please enter a valid category description, '
-    cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in cat_name.split()),
-    category_check = Category.query.filter_by(
-        cat_name=cat_name).first()
-    if category_check:
-        msg = msg + 'Category name already exists, '
     if msg:
         return ({'Message': msg}, 400)
     return True

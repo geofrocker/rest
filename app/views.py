@@ -315,6 +315,12 @@ class CategoryList(Resource):
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_category(data)
         if clean==True:
+            cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in data.get('cat_name').split())
+            category_check = Category.query.filter_by(
+                cat_name=cat_name, created_by=current_user.username).all()
+            if category_check:
+                msg = msg + 'Category name already exists'
+                return ({'Message': msg}, 400)
             new_category = Category(
                 cat_id=str(
                     uuid.uuid4()),
