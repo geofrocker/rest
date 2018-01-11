@@ -319,7 +319,7 @@ class CategoryList(Resource):
             category_check = Category.query.filter_by(
                 cat_name=cat_name, created_by=current_user.username).all()
             if category_check:
-                msg = msg + 'Category name already exists'
+                msg = 'Category name already exists'
                 return ({'Message': msg}, 400)
             new_category = Category(
                 cat_id=str(
