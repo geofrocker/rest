@@ -1,7 +1,7 @@
 # Yummy-Recipes Restful API
-[![Build Status](https://travis-ci.org/geofrocker/rest.svg?branch=master)](https://travis-ci.org/geofrocker/rest)
-[![Coverage Status](https://coveralls.io/repos/github/geofrocker/rest/badge.svg?branch=master)](https://coveralls.io/github/geofrocker/rest?branch=develop)
-[![Requirements Status](https://requires.io/github/geofrocker/rest/requirements.svg?branch=master)](https://requires.io/github/geofrocker/rest/requirements/?branch=master)
+[![Build Status](https://travis-ci.org/geofrocker/rest.svg?branch=develop)](https://travis-ci.org/geofrocker/rest)
+[![Coverage Status](https://coveralls.io/repos/github/geofrocker/rest/badge.svg?branch=develop)](https://coveralls.io/github/geofrocker/rest?branch=develop)
+[![Requirements Status](https://requires.io/github/geofrocker/rest/requirements.svg?branch=develop)](https://requires.io/github/geofrocker/rest/requirements/?branch=develop)
 # Description
 Yummy recipies API is an api built using restframework
   * A user can see the available recipes
