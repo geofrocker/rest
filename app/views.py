@@ -297,7 +297,8 @@ class CategoryList(Resource):
         """
         Get all Categories
         """
-        categories = Category.query.all()
+        categories = Category.filter_by(
+            created_by=current_user.username).all()
         if categories:
             category_list = marshal(categories, category_serializer)
             return ({"Category_list": category_list}, 200)
