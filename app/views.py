@@ -223,18 +223,19 @@ class AuthLogin(Resource):
                     dict(
                         error='Please enter your username and password')),
                 400)
-        user = User.query.filter_by(username=auth['username']).first()
+        username = text_to_title_case(auth['username']),
+        user = User.query.filter_by(username=username).first()
         if not user:
             return make_response(
                 jsonify(
                     dict(
-                        error='User does not exist, Make sure username starts with an Upper case letter')),
+                        error='User does not exist')),
                 400)
 
         if check_password_hash(user.password, auth['password']):
             token = jwt.encode({'id': user.user_id, 'exp': datetime.utcnow(
             ) + timedelta(minutes=6000)}, config('SECRET_KEY'))
-            return jsonify({'token': token.decode('UTF-8')})
+            return jsonify({'token': token.decode('UTF-8'),'username':username})
         return make_response(jsonify(dict(error='Invalid password')), 400)
 
 
@@ -297,7 +298,8 @@ class CategoryList(Resource):
         """
         Get all Categories
         """
-        categories = Category.query.all()
+        categories = Category.query.filter_by(
+            created_by=current_user.username).all()
         if categories:
             category_list = marshal(categories, category_serializer)
             return ({"Category_list": category_list}, 200)
@@ -378,7 +380,7 @@ class CategoryItem(Resource):
             delete(category)
             return ({'message': 'Category Deleted successfully'}, 200)
         return (
-            {'message': 'Category has recipes attached to it. Deletion failed'}, 401)
+            {'message': 'Category has recipes attached to it. Deletion failed'}, 400)
 
 
 class MyRecipes(Resource):
