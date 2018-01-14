@@ -46,31 +46,48 @@ def token_required(f):
 
 class RecipesList(Resource):
     "Handle getting and creating recipes"
-    def get(self):
+    def get(self,page=1):
         """
         Get all Recipes
         """
         search = request.args.get('q')
         page = request.args.get('page')
-        category = request.args.get('category')
-        if category:
-            category = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in category.split()),
         if page:
             page = int(page)
-        if search:
+        if search and page:
             recipes = Recipe.query.filter(
                 Recipe.title.ilike(
                     '%' + search + '%'),
-                Recipe.status.ilike('public')).all()
+                Recipe.status.ilike('public'),)
             rec = Recipe.query.filter(
                 Recipe.category.ilike(
                     '%' + search + '%'),
-                Recipe.status.ilike('public')).all()
+                Recipe.status.ilike('public'))
             if rec:
-                recipes = rec
+                recipes = recipes.union(rec)
+
+            recipes=recipes.paginate(
+                    page, POSTS_PER_PAGE, False)
+            pages = recipes.pages
+            has_prev = recipes.has_prev
+            has_next = recipes.has_next
+
+            if has_next:
+                next_page = request.url_root + "?q="+search+"&" + \
+                    "page=" + str(page + 1)
+            else:
+                next_page = 'Null'
+
+            if has_prev:
+                previous_page = request.url_root + "?q="+search+"&" + \
+                    "page=" + str(page - 1)
+            else:
+                previous_page = 'Null'
+            recipes = recipes.items
         elif page:
             recipes = Recipe.query.filter_by(
-                status='public').paginate(
+                status='public')
+            recipes=recipes.paginate(
                     page, POSTS_PER_PAGE, False)
             pages = recipes.pages
             has_prev = recipes.has_prev
@@ -88,23 +105,16 @@ class RecipesList(Resource):
             else:
                 previous_page = 'Null'
             recipes = recipes.items
-            if recipes:
-                recipe_list = marshal(recipes, recipe_serializer)
-                return ({"Recipe_list": recipe_list,
-                         "has_next": has_next,
-                         "total_pages": pages,
-                         "previous_page": previous_page,
-                         "next_page": next_page
-                        }, 200)
-            else:
-                return ({'message': 'No recipes found'}, 404)
-        elif category:
-            recipes = Recipe.query.filter_by(category=category, status='public').all()
         else:
-            recipes = Recipe.query.filter_by(status='public').all()
+            recipes = Recipe.query.filter_by(status='public')
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
-            return ({"Recipe_list": recipe_list}, 200)
+            return ({"Recipe_list": recipe_list,
+                        "has_next": has_next,
+                        "total_pages": pages,
+                        "previous_page": previous_page,
+                        "next_page": next_page
+                    }, 200)
         else:
             return ({'message': 'No recipes found'}, 404)
 
@@ -298,13 +308,92 @@ class CategoryList(Resource):
         """
         Get all Categories
         """
-        categories = Category.query.filter_by(
-            created_by=current_user.username).all()
-        if categories:
-            category_list = marshal(categories, category_serializer)
-            return ({"Category_list": category_list}, 200)
+        POSTS_PER_PAGE = 2
+    
+        search = request.args.get('q')
+        page = request.args.get('page')
+        if page:
+            page = int(page)
+        if search and page:
+            categories = Category.query.filter(
+                Category.cat_name.ilike(
+                    '%' + search + '%'),
+                Category.created_by == current_user.username)
+            cat = Category.query.filter(
+                Category.cat_desc.ilike(
+                    '%' + search + '%'),
+                Category.created_by == current_user.username)
+            if cat:
+                categories = categories.union(cat)
+
+            categories=categories.paginate(
+                    page, POSTS_PER_PAGE, False)
+            pages = categories.pages
+            has_prev = categories.has_prev
+            has_next = categories.has_next
+
+            if has_next:
+                next_page = request.url_root + "category?q="+search+"&" + \
+                    "page=" + str(page + 1)
+            else:
+                next_page = 'Null'
+
+            if has_prev:
+                previous_page = request.url_root + "category?q="+search+"&" + \
+                    "page=" + str(page - 1)
+            else:
+                previous_page = 'Null'
+            categories = categories.items
+            if categories:
+                categories = marshal(categories, category_serializer)
+                return ({"Category_list": categories,
+                            "has_next": has_next,
+                            "total_pages": pages,
+                            "previous_page": previous_page,
+                            "next_page": next_page
+                        }, 200)
+            else:
+                return ({'message': 'No categories found'}, 404)
+        elif page:
+            page = int(page)
+            categories = Category.query.filter_by(
+                created_by=current_user.username)
+            categories=categories.paginate(
+                        page, POSTS_PER_PAGE, False)
+            pages = categories.pages
+            has_prev = categories.has_prev
+            has_next = categories.has_next
+
+            if has_next:
+                next_page = request.url_root + "category?" + \
+                    "page=" + str(page + 1)
+            else:
+                next_page = 'Null'
+
+            if has_prev:
+                previous_page = request.url_root + "category?" + \
+                    "page=" + str(page - 1)
+            else:
+                previous_page = 'Null'
+            categories = categories.items
+            if categories:
+                categories = marshal(categories, category_serializer)
+                return ({"Category_list": categories,
+                            "has_next": has_next,
+                            "total_pages": pages,
+                            "previous_page": previous_page,
+                            "next_page": next_page
+                        }, 200)
+            else:
+                return ({'message': 'No categories found'}, 404)
         else:
-            return ({'message': 'No categories found'}, 404)
+            categories = Category.query.filter_by(
+                created_by=current_user.username).all()
+            if categories:
+                category_list = marshal(categories, category_serializer)
+                return ({"Category_list": category_list}, 200)
+            else:
+                return ({'message': 'No categories found'}, 404)
 
     @token_required
     def post(current_user, self):
@@ -392,11 +481,69 @@ class MyRecipes(Resource):
         """
         Get all Recipes
         """
-        recipes = Recipe.query.filter_by(
-            created_by=current_user.username).all()
+        search = request.args.get('q')
+        page = request.args.get('page')
+        if page:
+            page = int(page)
+        if search and page:
+            recipes = Recipe.query.filter(
+                Recipe.title.ilike(
+                    '%' + search + '%'),
+                Recipe.created_by == current_user.username)
+            rec = Recipe.query.filter(
+                Recipe.category.ilike(
+                    '%' + search + '%'),
+                Recipe.created_by == current_user.username)
+            if rec:
+                recipes = recipes.union(rec)
+
+            recipes=recipes.paginate(
+                    page, POSTS_PER_PAGE, False)
+            pages = recipes.pages
+            has_prev = recipes.has_prev
+            has_next = recipes.has_next
+
+            if has_next:
+                next_page = request.url_root + "myrecipes?q="+search+"&" + \
+                    "page=" + str(page + 1)
+            else:
+                next_page = 'Null'
+
+            if has_prev:
+                previous_page = request.url_root + "myrecipes?q="+search+"&" + \
+                    "page=" + str(page - 1)
+            else:
+                previous_page = 'Null'
+            recipes = recipes.items
+        elif page:
+            recipes = Recipe.query.filter_by(
+                created_by=current_user.username)
+            recipes=recipes.paginate(
+                        page, POSTS_PER_PAGE, False)
+            pages = recipes.pages
+            has_prev = recipes.has_prev
+            has_next = recipes.has_next
+
+            if has_next:
+                next_page = request.url_root + "myrecipes?" + \
+                    "page=" + str(page + 1)
+            else:
+                next_page = 'Null'
+
+            if has_prev:
+                previous_page = request.url_root + "myrecipes?" + \
+                    "page=" + str(page - 1)
+            else:
+                previous_page = 'Null'
+            recipes = recipes.items
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
-            return ({"Recipe_list": recipe_list}, 200)
+            return ({"Recipe_list": recipe_list,
+                        "has_next": has_next,
+                        "total_pages": pages,
+                        "previous_page": previous_page,
+                        "next_page": next_page
+                    }, 200)
         else:
             return ({'message': 'No recipes found'}, 404)
 

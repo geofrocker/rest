@@ -49,6 +49,8 @@ def clean_recipe(data):
         return ({'Message': msg}, 400)
     if not validate_text(title):
         msg = msg + 'Please enter a valid title, '
+    if not re.match("^[A-Za-z0-9_ -]*$", title):
+        msg = msg + 'Please enter a valid title, '
     if not validate_text(ingredients):
         msg = msg + 'Please enter valid ingredients, '
     if not validate_text(steps):
@@ -58,10 +60,6 @@ def clean_recipe(data):
     category = Category.query.filter_by(cat_name=category).first()
     if not category:
         msg = msg + 'Category does not exist, '
-    title = text_to_title_case(title)
-    recipe_check = Recipe.query.filter_by(title=title).first()
-    if recipe_check:
-        msg = msg + 'Title already exists, '
     if msg:
         return ({'Message': msg}, 400)
     return True
