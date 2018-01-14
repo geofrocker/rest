@@ -105,8 +105,6 @@ class RecipesList(Resource):
             else:
                 previous_page = 'Null'
             recipes = recipes.items
-        else:
-            recipes = Recipe.query.filter_by(status='public')
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
             return ({"Recipe_list": recipe_list,
