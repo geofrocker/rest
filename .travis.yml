@@ -10,6 +10,7 @@ services:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install pep8
   - pip install coveralls
   - pip install coverage
 
@@ -30,5 +31,7 @@ before_script:
 # command to run tests
 script:
     - nosetests --with-coverage --cover-package=app
+    - pep8 --show-source --show-pep8 . || exit 0
+    - nosetests --with-coverage --cover-package=recipes
 after_success:
   coveralls
