@@ -16,7 +16,7 @@ from app.models import User, Recipe, Category, UpVote, Review
 from app.models import save, delete
 from app.utils import clean_recipe, clean_user, clean_category, text_to_title_case
 
-POSTS_PER_PAGE = 2
+POSTS_PER_PAGE = 10
 
 
 def token_required(f):
@@ -105,10 +105,14 @@ class RecipesList(Resource):
             else:
                 previous_page = 'Null'
             recipes = recipes.items
+        else:
+            return ({'message': 'No recipes found'}, 404)
         if recipes:
             recipe_list = marshal(recipes, recipe_serializer)
             return ({"Recipe_list": recipe_list,
                         "has_next": has_next,
+                        "has_prev": has_prev,
+                        "page": page,
                         "total_pages": pages,
                         "previous_page": previous_page,
                         "next_page": next_page
@@ -199,7 +203,7 @@ class AuthRegister(Resource):
         """Register New User"""
         data = request.get_json()
         if not data:
-            return ({'Message': 'No data submitted'}, 401)
+            return ({'Message': 'No data submitted'}, 400)
         clean = clean_user(data)
         if clean == True:
             password_hash = generate_password_hash(
@@ -346,6 +350,7 @@ class CategoryList(Resource):
                 categories = marshal(categories, category_serializer)
                 return ({"Category_list": categories,
                             "has_next": has_next,
+                            "has_prev": has_prev,
                             "total_pages": pages,
                             "previous_page": previous_page,
                             "next_page": next_page
@@ -534,10 +539,15 @@ class MyRecipes(Resource):
             else:
                 previous_page = 'Null'
             recipes = recipes.items
+        else:
+            return ({'message': 'No recipes found'}, 404)
         if recipes:
+            
             recipe_list = marshal(recipes, recipe_serializer)
             return ({"Recipe_list": recipe_list,
                         "has_next": has_next,
+                        "has_prev": has_prev,
+                        "page": page,
                         "total_pages": pages,
                         "previous_page": previous_page,
                         "next_page": next_page
