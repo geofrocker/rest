@@ -64,6 +64,8 @@ class Category(db.Model):
         db.ForeignKey('User.username'),
         nullable=True)
     modified_date = db.Column(db.DateTime)
+    recipes_rel = db.relationship("Recipe", backref='category_rel', lazy='dynamic',
+                              cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Name %r>' % self.cat_name

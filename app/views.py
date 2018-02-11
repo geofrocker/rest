@@ -310,7 +310,7 @@ class CategoryList(Resource):
         """
         Get all Categories
         """
-        POSTS_PER_PAGE = 2
+        POSTS_PER_PAGE = 20
     
         search = request.args.get('q')
         page = request.args.get('page')
@@ -351,6 +351,7 @@ class CategoryList(Resource):
                 return ({"Category_list": categories,
                             "has_next": has_next,
                             "has_prev": has_prev,
+                            "page": page,
                             "total_pages": pages,
                             "previous_page": previous_page,
                             "next_page": next_page
@@ -383,6 +384,8 @@ class CategoryList(Resource):
                 categories = marshal(categories, category_serializer)
                 return ({"Category_list": categories,
                             "has_next": has_next,
+                            "has_prev": has_prev,
+                            "page": page,
                             "total_pages": pages,
                             "previous_page": previous_page,
                             "next_page": next_page
@@ -445,13 +448,8 @@ class CategoryItem(Resource):
             return ({'message': 'Category Not found'}, 404)
         if not data:
             return ({'Message': 'No data submitted'}, 400)
-        clean = clean_category(data)
+        clean = clean_category(data, current_user.username)
         if clean==True:
-            connected_recipes = Recipe.query.filter_by(
-                category=category.cat_name).first()
-            if connected_recipes:
-                return (
-                    {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
             category.cat_name = text_to_title_case(data['cat_name'])
             category.cat_desc = data['cat_desc']
             category.modified_date = datetime.now()
@@ -466,15 +464,9 @@ class CategoryItem(Resource):
         category = Category.query.filter_by(cat_id=id).first()
         if not category:
             return ({'message': 'Category Not found'}, 404)
-        connected_recipes = Recipe.query.filter_by(
-            category=category.cat_name).first()
-        if not connected_recipes:
-            delete(category)
-            return ({'message': 'Category Deleted successfully'}, 200)
-        return (
-            {'message': 'Category has recipes attached to it. Deletion failed'}, 400)
-
-
+        delete(category)
+        return ({'message': 'Category Deleted successfully'}, 200)
+        
 class MyRecipes(Resource):
     """
     Get recipe for a logged in user. Both public and private
@@ -610,7 +602,7 @@ class Reviews(Resource):
             recipe = marshal(recipe, recipe_serializer)
             message = 'Thank you! for your review'
             return ({'review':review, 'Recipe':recipe, 'message':message}, 201)
-        return ({'message': 'No review submitted'}, 401)
+        return ({'message': 'No review submitted'}, 400)
 
     @token_required
     def get(current_user, self, id):
