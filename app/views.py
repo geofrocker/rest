@@ -448,8 +448,13 @@ class CategoryItem(Resource):
             return ({'message': 'Category Not found'}, 404)
         if not data:
             return ({'Message': 'No data submitted'}, 400)
-        clean = clean_category(data, current_user.username)
+        clean = clean_category(data)
         if clean==True:
+            connected_recipes = Recipe.query.filter_by(
+                category=category.cat_name).first()
+            if connected_recipes:
+                return (
+                    {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
             category.cat_name = text_to_title_case(data['cat_name'])
             category.cat_desc = data['cat_desc']
             category.modified_date = datetime.now()

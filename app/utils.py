@@ -99,7 +99,7 @@ def clean_user(data):
     return True
 
 
-def clean_category(data, user):
+def clean_category(data):
     """
     Ensure that category data submitted is clean
     """
@@ -115,7 +115,7 @@ def clean_category(data, user):
         msg = msg + 'Please enter a valid category description, '
     cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in cat_name.split())
     category_check = Category.query.filter_by(
-        cat_name=cat_name, created_by=user).first()
+        cat_name=cat_name, ).first()
     if category_check:
         msg = msg + 'Category name already exists, '
     if msg:
