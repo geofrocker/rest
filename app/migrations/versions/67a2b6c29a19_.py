@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3ff65b3f8845
+Revision ID: 67a2b6c29a19
 Revises: 
-Create Date: 2018-01-11 11:42:46.240617
+Create Date: 2018-02-12 19:37:06.982928
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3ff65b3f8845'
+revision = '67a2b6c29a19'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -35,9 +35,8 @@ def upgrade():
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('created_by', sa.String(), nullable=True),
     sa.Column('modified_date', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['created_by'], ['User.username'], ),
-    sa.PrimaryKeyConstraint('cat_id'),
-    sa.UniqueConstraint('cat_name')
+    sa.ForeignKeyConstraint(['created_by'], ['User.user_id'], ),
+    sa.PrimaryKeyConstraint('cat_id')
     )
     op.create_table('Recipe',
     sa.Column('recipe_id', sa.String(length=120), nullable=False),
@@ -51,8 +50,8 @@ def upgrade():
     sa.Column('status', sa.String(), nullable=True),
     sa.Column('upvotes', sa.Integer(), nullable=True),
     sa.Column('reviews', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['category'], ['Category.cat_name'], ),
-    sa.ForeignKeyConstraint(['created_by'], ['User.username'], ),
+    sa.ForeignKeyConstraint(['category'], ['Category.cat_id'], ),
+    sa.ForeignKeyConstraint(['created_by'], ['User.user_id'], ),
     sa.PrimaryKeyConstraint('recipe_id')
     )
     op.create_table('Review',
@@ -61,7 +60,7 @@ def upgrade():
     sa.Column('recipe_id', sa.String(), nullable=True),
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('created_by', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['created_by'], ['User.username'], ),
+    sa.ForeignKeyConstraint(['created_by'], ['User.user_id'], ),
     sa.ForeignKeyConstraint(['recipe_id'], ['Recipe.recipe_id'], ),
     sa.PrimaryKeyConstraint('review_id')
     )
@@ -70,7 +69,7 @@ def upgrade():
     sa.Column('recipe_id', sa.String(), nullable=True),
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('created_by', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['created_by'], ['User.username'], ),
+    sa.ForeignKeyConstraint(['created_by'], ['User.user_id'], ),
     sa.ForeignKeyConstraint(['recipe_id'], ['Recipe.recipe_id'], ),
     sa.PrimaryKeyConstraint('vote_id')
     )

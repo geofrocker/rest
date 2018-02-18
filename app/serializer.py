@@ -4,11 +4,12 @@ from flask_restful import fields
 recipe_serializer = {
     "recipe_id": fields.String,
     "title": fields.String,
-    "category": fields.String,
+    "category":fields.String,
+    "category_rel": fields.String,
     "ingredients": fields.String,
     "steps": fields.String,
     "create_date": fields.DateTime,
-    "created_by": fields.String,
+    "author": fields.String,
     "modified_date": fields.DateTime,
     "upvotes": fields.Integer,
     "reviews": fields.Integer,
@@ -20,7 +21,7 @@ category_serializer = {
     "cat_name": fields.String,
     "cat_desc": fields.String,
     "create_date": fields.DateTime,
-    "created_by": fields.String,
+    "author": fields.String,
     "modified_date": fields.DateTime,
 }
 
@@ -37,5 +38,5 @@ review_serializer = {
     "content": fields.String,
     "recipe_id": fields.String,
     "create_date": fields.String,
-    "created_by": fields.String,
+    "author": fields.String,
 }

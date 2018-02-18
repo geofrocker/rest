@@ -16,7 +16,7 @@ from app.models import User, Recipe, Category, UpVote, Review
 from app.models import save, delete
 from app.utils import clean_recipe, clean_user, clean_category, text_to_title_case
 
-POSTS_PER_PAGE = 10
+POSTS_PER_PAGE = 3
 
 
 def token_required(f):
@@ -134,11 +134,11 @@ class RecipesList(Resource):
                 recipe_id=str(
                     uuid.uuid4()),   
                 title=text_to_title_case(data['title']),
-                category=text_to_title_case(data['category']),
+                category=data['category'],
                 ingredients=data['ingredients'],
                 steps=data['steps'],
                 create_date=datetime.now(),
-                created_by=current_user.username,
+                created_by=current_user.user_id,
                 modified_date=datetime.now(),
                 status=data['status'],
                 upvotes=0,
@@ -157,6 +157,7 @@ class RecipeItem(Resource):
     def get(current_user, self, id):
         """get on one recipe"""
         recipe = Recipe.query.filter_by(recipe_id=id).first()
+        print(recipe.category_rel.cat_desc)
         if recipe:
             recipe_item = marshal(recipe, recipe_serializer)
             return {"Recipe_Item": recipe_item}, 200
@@ -320,11 +321,11 @@ class CategoryList(Resource):
             categories = Category.query.filter(
                 Category.cat_name.ilike(
                     '%' + search + '%'),
-                Category.created_by == current_user.username)
+                Category.created_by == current_user.user_id)
             cat = Category.query.filter(
                 Category.cat_desc.ilike(
                     '%' + search + '%'),
-                Category.created_by == current_user.username)
+                Category.created_by == current_user.user_id)
             if cat:
                 categories = categories.union(cat)
 
@@ -361,7 +362,7 @@ class CategoryList(Resource):
         elif page:
             page = int(page)
             categories = Category.query.filter_by(
-                created_by=current_user.username)
+                created_by=current_user.user_id)
             categories=categories.paginate(
                         page, POSTS_PER_PAGE, False)
             pages = categories.pages
@@ -394,7 +395,7 @@ class CategoryList(Resource):
                 return ({'message': 'No categories found'}, 404)
         else:
             categories = Category.query.filter_by(
-                created_by=current_user.username).all()
+                created_by=current_user.user_id).all()
             if categories:
                 category_list = marshal(categories, category_serializer)
                 return ({"Category_list": category_list}, 200)
@@ -417,7 +418,7 @@ class CategoryList(Resource):
                 cat_name=text_to_title_case(data['cat_name']),
                 cat_desc=data['cat_desc'],
                 create_date=datetime.now(),
-                created_by=current_user.username,
+                created_by=current_user.user_id,
                 modified_date=datetime.now())
             save(new_category)
             return ({'Message': 'Category Created', 'status': 201}, 201)
@@ -450,11 +451,6 @@ class CategoryItem(Resource):
             return ({'Message': 'No data submitted'}, 400)
         clean = clean_category(data)
         if clean==True:
-            connected_recipes = Recipe.query.filter_by(
-                category=category.cat_name).first()
-            if connected_recipes:
-                return (
-                    {'Message': 'Cannot edit recipe because there a recipes attached to it'}, 400)
             category.cat_name = text_to_title_case(data['cat_name'])
             category.cat_desc = data['cat_desc']
             category.modified_date = datetime.now()
@@ -489,11 +485,11 @@ class MyRecipes(Resource):
             recipes = Recipe.query.filter(
                 Recipe.title.ilike(
                     '%' + search + '%'),
-                Recipe.created_by == current_user.username)
+                Recipe.created_by == current_user.user_id)
             rec = Recipe.query.filter(
                 Recipe.category.ilike(
                     '%' + search + '%'),
-                Recipe.created_by == current_user.username)
+                Recipe.created_by == current_user.user_id)
             if rec:
                 recipes = recipes.union(rec)
 
@@ -517,7 +513,7 @@ class MyRecipes(Resource):
             recipes = recipes.items
         elif page:
             recipes = Recipe.query.filter_by(
-                created_by=current_user.username)
+                created_by=current_user.user_id)
             recipes=recipes.paginate(
                         page, POSTS_PER_PAGE, False)
             pages = recipes.pages
@@ -563,7 +559,7 @@ class Upvote(Resource):
         Get all votes for a particular recipe
         """
         recipe = Recipe.query.filter_by(recipe_id=id).first()
-        voted = UpVote.query.filter_by(recipe_id=id, created_by=current_user.username).first()
+        voted = UpVote.query.filter_by(recipe_id=id, created_by=current_user.user_id).first()
         if not recipe:
             return ({'message': 'Recipe does not exist'}, 404)
         if voted and recipe:
@@ -575,7 +571,7 @@ class Upvote(Resource):
                 uuid.uuid4()),
             recipe_id=id,
             create_date=datetime.now(),
-            created_by=current_user.username)
+            created_by=current_user.user_id)
         save(new_vote)
         return ({'message': 'Thank you for voting'}, 201)
 
@@ -601,7 +597,7 @@ class Reviews(Resource):
                 content = data['content'],
                 recipe_id=id,
                 create_date=datetime.now(),
-                created_by=current_user.username)
+                created_by=current_user.user_id)
             save(new_review)
             review = marshal(new_review,review_serializer)
             recipe = marshal(recipe, recipe_serializer)

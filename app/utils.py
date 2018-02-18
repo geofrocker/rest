@@ -39,7 +39,6 @@ def clean_recipe(data):
     steps = data.get('steps')
     status = data.get('status')
     category = data.get('category')
-    category = text_to_title_case(category)
     msg = ''
     if not(title and ingredients and steps and status):
         msg = msg + 'Populate all the required fields, '
@@ -57,7 +56,7 @@ def clean_recipe(data):
         msg = msg + 'Please enter valid steps, '
     if not(status == 'public' or status == 'private'):
         msg = msg + 'The status should either be public or private, '
-    category = Category.query.filter_by(cat_name=category).first()
+    category = Category.query.filter_by(cat_id=category).first()
     if not category:
         msg = msg + 'Category does not exist, '
     if msg:
@@ -116,8 +115,6 @@ def clean_category(data):
     cat_name = ' '.join(''.join([w[0].upper(), w[1:].lower()]) for w in cat_name.split())
     category_check = Category.query.filter_by(
         cat_name=cat_name, ).first()
-    if category_check:
-        msg = msg + 'Category name already exists, '
     if msg:
         return ({'Message': msg}, 400)
     return True

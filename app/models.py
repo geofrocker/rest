@@ -12,9 +12,13 @@ class User(db.Model):
     username = db.Column(db.String(120), unique=True)
     email = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
+    categories = db.relationship('Category', backref='author', lazy='dynamic')
+    recipes = db.relationship('Recipe', backref='author', lazy='dynamic')
+    reviews = db.relationship('Review', backref='author', lazy='dynamic')
+
 
     def __repr__(self):
-        return '%r' % self.user_id
+        return self.username
 
 # Create Recipe database model
 
@@ -28,7 +32,7 @@ class Recipe(db.Model):
     title = db.Column(db.String(120))
     category = db.Column(
         db.String,
-        db.ForeignKey('Category.cat_name'),
+        db.ForeignKey('Category.cat_id'),
         nullable=True)
     ingredients = db.Column(db.String(120))
     steps = db.Column(db.String(120))
@@ -36,7 +40,7 @@ class Recipe(db.Model):
     modified_date = db.Column(db.DateTime, nullable=True)
     created_by = db.Column(
         db.String,
-        db.ForeignKey('User.username'),
+        db.ForeignKey('User.user_id'),
         nullable=True)
     status = db.Column(db.String, default='public')
     upvotes = db.Column(db.Integer)
@@ -56,19 +60,19 @@ class Category(db.Model):
     """
     __tablename__ = "Category"
     cat_id = db.Column(db.String(100), primary_key=True)
-    cat_name = db.Column(db.String(50), unique=True)
+    cat_name = db.Column(db.String(50))
     cat_desc = db.Column(db.String(100))
     create_date = db.Column(db.DateTime)
     created_by = db.Column(
         db.String,
-        db.ForeignKey('User.username'),
+        db.ForeignKey('User.user_id'),
         nullable=True)
     modified_date = db.Column(db.DateTime)
     recipes_rel = db.relationship("Recipe", backref='category_rel', lazy='dynamic',
                               cascade="all, delete-orphan")
 
     def __repr__(self):
-        return '<Name %r>' % self.cat_name
+        return self.cat_name
 
 # Create review model
 
@@ -86,7 +90,7 @@ class Review(db.Model):
     create_date = db.Column(db.DateTime)
     created_by = db.Column(
         db.String,
-        db.ForeignKey('User.username'),
+        db.ForeignKey('User.user_id'),
         nullable=True)
 
     def __repr__(self):
@@ -105,7 +109,7 @@ class UpVote(db.Model):
     create_date = db.Column(db.DateTime)
     created_by = db.Column(
         db.String,
-        db.ForeignKey('User.username'),
+        db.ForeignKey('User.user_id'),
         nullable=True)
 
     def __repr__(self):
